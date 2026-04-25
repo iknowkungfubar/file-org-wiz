@@ -8,10 +8,20 @@ This is a prompt and documentation package to completely reorganize any computer
 
 ## Quick Start
 
-1. **Read the prompt**: `AI_File_Organization_Agent_Prompt.md`
-2. **Understand why**: `Why_PARA_Zettelkasten.md`
-3. **Install for your system**: See installation guides below
-4. **Give to an AI**: Use the prompt with Claude/GPT/OpenCode to reorganize your files
+1. **[QUICKSTART.md](./QUICKSTART.md)** - Get started in 5 minutes
+2. Install: `pip install flask && python mcp_server.py`
+3. Use: Say "organize files at [path]" to your AI
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [QUICKSTART.md](./QUICKSTART.md) | 5-minute setup |
+| [USER_GUIDE.md](./USER_GUIDE.md) | Complete user guide |
+| [FAQ.md](./FAQ.md) | Frequently asked questions |
+| [REFERENCE_CARD.md](./REFERENCE_CARD.md) | Print-ready reference |
+| [CHEATSHEET.md](./CHEATSHEET.md) | All commands |
+| [Why_PARA_Zettelkasten.md](./Why_PARA_Zettelkasten.md) | Methodology explanation |
 
 ## Installation by System
 
@@ -19,16 +29,16 @@ This is a prompt and documentation package to completely reorganize any computer
 |--------|-------|-------|
 | Claude Desktop | `install_claude_desktop.md` | MCP config |
 | Claude Code | `install_claude_code.md` | Tool config |
-| OpenCode | `install_opencode.md` | Skill file |
-| Aider | `install_aider.md` | Script |
-| Cursor/Windsurf | `install_cursor_windsurf.md` | Rules |
-| Codex | `install_codex.md` | Rules |
 | GitHub Copilot | `install_copilot.md` | Custom instructions |
+| OpenAI Codex | `install_codex.md` | Rules |
 | Codeium | `install_codeium.md` | Rules file |
 | Tabnine | `install_tabnine.md` | Rules file |
 | Cody | `install_cody.md` | Rules file |
 | Continue | `install_continue.md` | MCP config |
-| Raycast | `install_raycast.md` | Script |
+| Cursor/Windsurf | `install_cursor_windsurf.md` | Rules |
+| Aider | `install_aider.md` | Script |
+| OpenCode | `install_opencode.md` | Skill file |
+| Raycast | `install_raycast.md` | Script command |
 | Mint CLI | `install_mint.md` | Tool |
 | gptme | `install_gptme.md` | Commands |
 | Amazon Q | `install_amazonq.md` | Custom instructions |
@@ -44,6 +54,11 @@ This is a prompt and documentation package to completely reorganize any computer
 | `SKILL.md` | OpenCode skill |
 | `research/` | Original research and documentation |
 | `install_*.md` | System-specific installation guides |
+| `QUICKSTART.md` | 5-minute setup guide |
+| `USER_GUIDE.md` | Comprehensive usage guide |
+| `FAQ.md` | Frequently asked questions |
+| `REFERENCE_CARD.md` | Print-ready quick reference |
+| `CHEATSHEET.md` | All commands |
 
 ## Requirements
 
