@@ -30,6 +30,19 @@ from typing import Optional, Any
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 
+# Import scanner and duplicates modules
+try:
+    from scanner import scan_and_categorize, suggest_category
+except ImportError:
+    scan_and_categorize = None
+    suggest_category = None
+
+try:
+    from duplicates import find_all_duplicates, merge_all_duplicates
+except ImportError:
+    find_all_duplicates = None
+    merge_all_duplicates = None
+
 app = Flask(__name__)
 
 # =============================================================================
@@ -359,7 +372,8 @@ def organize() -> tuple[Response, int]:
         "backup_path": "/path/to/backup",
         "create_vault": true/false,
         "vault_path": "/path/to/vault",
-        "do_backup": true/false
+        "do_backup": true/false,
+        "dry_run": true/false
     }
     """
     data: dict[str, Any] = request.json or {}
@@ -370,6 +384,7 @@ def organize() -> tuple[Response, int]:
     create_vault = bool(data.get("create_vault", False))
     vault = data.get("vault_path", VAULT_PATH)
     do_backup = bool(data.get("do_backup", True))
+    dry_run = bool(data.get("dry_run", False))
 
     # Validate paths
     valid, error = validate_path(mount)
@@ -383,11 +398,13 @@ def organize() -> tuple[Response, int]:
     result: dict[str, Any] = {
         "timestamp": datetime.now().isoformat(),
         "mount_path": mount,
-        "phases": []
+        "dry_run": dry_run,
+        "phases": [],
+        "suggested_actions": []
     }
 
-    # Phase 1: Backup (optional)
-    if do_backup:
+    # Phase 1: Backup (optional, skip in dry-run)
+    if do_backup and not dry_run:
         backup_result = create_backup(mount, backup)
         result["phases"].append({
             "name": "backup",
@@ -397,17 +414,42 @@ def organize() -> tuple[Response, int]:
             "errors": backup_result.get("errors", [])
         })
 
-    # Phase 2: Structure
-    structure_result = create_folder_structure(mount)
-    result["phases"].append({
-        "name": "create_structure",
-        "status": "complete",
-        "folders_created": len(structure_result["created"]),
-        "errors": structure_result.get("errors", [])
-    })
+    # Phase 2: Scan and Categorize (if dry_run, this is the main phase)
+    categorize_result = {"files_scanned": 0, "categorized": [], "summary": {}}
+    if scan_and_categorize:
+        categorize_result = scan_and_categorize(mount, use_date=False)
+        result["phases"].append({
+            "name": "scan_and_categorize",
+            "status": "complete",
+            "files_scanned": categorize_result["total_files"],
+            "summary": categorize_result["summary"]
+        })
+        
+        # Generate suggested actions for dry-run
+        if dry_run:
+            for f in categorize_result["files"]:
+                fpath = f.get("path", "")
+                fcategory = f.get("category", "")
+                result["suggested_actions"].append({
+                    "action": "categorize",
+                    "from": fpath,
+                    "to": os.path.join(mount, fcategory),
+                    "reason": f.get("reason", ""),
+                    "confidence": f.get("confidence", "")
+                })
+    
+    # Phase 3: Structure (skip in dry-run as it's just folder creation)
+    if not dry_run:
+        structure_result = create_folder_structure(mount)
+        result["phases"].append({
+            "name": "create_structure",
+            "status": "complete",
+            "folders_created": len(structure_result["created"]),
+            "errors": structure_result.get("errors", [])
+        })
 
-    # Phase 3: Vault (optional)
-    if create_vault and vault:
+    # Phase 3: Vault (optional, skip in dry-run)
+    if create_vault and vault and not dry_run:
         valid, error = validate_path(vault)
         if valid:
             vault_result = create_folder_structure(vault)
@@ -423,6 +465,28 @@ def organize() -> tuple[Response, int]:
                 "status": "failed",
                 "error": error
             })
+
+    # Phase 4: Duplicate Detection (optional)
+    if find_all_duplicates and not dry_run:
+        dup_result = find_all_duplicates(mount, by_content=True, by_name=True)
+        result["phases"].append({
+            "name": "find_duplicates",
+            "status": "complete",
+            "duplicate_groups": dup_result.get("duplicate_groups", 0),
+            "total_duplicates": dup_result.get("total_duplicates", 0),
+            "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
+            "errors": dup_result.get("errors", [])
+        })
+        
+        # Generate suggested actions for duplicates (dry_run simulation)
+        if dry_run:
+            for group in dup_result.get("duplicates", []):
+                result["suggested_actions"].append({
+                    "action": "merge_duplicates",
+                    "from": [f.get("path") for f in group],
+                    "to": group[0].get("path"),  # Keep newest
+                    "reason": "content duplicate - keep newest",
+                })
 
     result["status"] = "complete"
     return jsonify(result), 200
