@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-1. [Understanding Para](#1-understanding-para)
+1. [Understanding PARA](#1-understanding-para)
 2. [The File System](#2-the-file-system)
 3. [Naming Conventions](#3-naming-conventions)
 4. [Daily Workflow](#4-daily-workflow)
@@ -117,7 +117,7 @@ YYYY-MM-DD__context__description__vNN.ext
 ### Examples
 
 | Document | Correct Name |
-|----------|-------------|
+|----------|--------------|
 | Resume dated April 24, 2026 | `2026-04-24__career__resume__v01.docx` |
 | Pitch deck, v2 | `2026-04-20__turin-tech__pitch-deck__v02.pdf` |
 | Meeting notes | `2026-04-25__project__weekly-sync__v01.md` |
@@ -127,7 +127,7 @@ YYYY-MM-DD__context__description__vNN.ext
 Create slugs for your projects/areas:
 
 | Project/Area | Slug |
-|-------------|-----|
+|-------------|------|
 | Your business | `turin-tech` |
 | Job search | `career` |
 | Health | `health` |
@@ -231,7 +231,7 @@ YOUR_VAULT/
 
 Use nested tags for flexibility:
 
-```
+```markdown
 #type/meeting
 #status/active  
 #project/turin-tech
@@ -243,7 +243,7 @@ Use nested tags for flexibility:
 Start server:
 
 ```bash
-python mcp_server.py --port 5000 \
+python src/mcp_server.py --port 5000 \
   --mount /your/mount \
   --backup /your/backup
 ```
@@ -253,10 +253,11 @@ API calls:
 ```bash
 # Organize
 curl -X POST localhost:5000/organize \
+  -H "Content-Type: application/json" \
   -d '{"mount_path": "/mount", "backup_path": "/backup"}'
 
 # Get structure
-curl localhost:5000/structure?path=/mount
+curl "localhost:5000/structure?path=/mount"
 ```
 
 ---

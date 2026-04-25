@@ -1,4 +1,4 @@
-# file-org-wiz Installation Guide
+# Installation Guide
 
 > Complete installation reference for all AI/agentic systems
 
@@ -9,7 +9,7 @@
 ```bash
 # 1. Clone or copy this repo to a local path
 # 2. Install dependencies
-pip install flask
+pip install -r requirements.txt
 
 # 3. Choose your integration method below
 ```
@@ -42,7 +42,7 @@ pip install flask
 ## System-Specific Guides
 
 ### Claude Desktop
-📄 `install_claude_desktop.md`
+📄 [`docs/install/claude_desktop.md`](docs/install/claude_desktop.md)
 
 ```bash
 mkdir -p ~/Library/Application\ Support/Claude/mcp_servers
@@ -51,7 +51,7 @@ cp file_org_wiz_mcp.json ~/Library/Application\ Support/Claude/mcp_servers/
 ```
 
 ### OpenCode 
-📄 `install_opencode.md`
+📄 [`docs/install/opencode.md`](docs/install/opencode.md)
 
 ```bash
 mkdir -p ~/.opencode/skills/file-org-wiz
@@ -59,18 +59,18 @@ cp SKILL.md ~/.opencode/skills/file-org-wiz/SKILL.md
 ```
 
 ### Aider
-📄 `install_aider.md`
+📄 [`docs/install/aider.md`](docs/install/aider.md)
 
 ```bash
 # Simple: run script in Aider terminal
 ./file-org-wiz-aider.sh
 
 # Advanced: MCP server
-python mcp_server.py --port 5001 &
+python src/mcp_server.py --port 5001 &
 ```
 
 ### Cursor/Windsurf
-📄 `install_cursor_windsurf.md`
+📄 [`docs/install/cursor_windsurf.md`](docs/install/cursor_windsurf.md)
 
 ```json
 // Add to .cursorrules
@@ -78,17 +78,17 @@ python mcp_server.py --port 5001 &
 ```
 
 ### Codex
-📄 `install_codex.md`
+📄 [`docs/install/codex.md`](docs/install/codex.md)
 
 ```markdown
 # Add to .codex/rules
 ```
 
 ### Any (HTTP)
-📄 `install_mcp_generic.md`
+📄 [`docs/install/mcp_generic.md`](docs/install/mcp_generic.md)
 
 ```bash
-python mcp_server.py --port 5000 &
+python src/mcp_server.py --port 5000 &
 curl -X POST localhost:5000/organize ...
 ```
 
@@ -99,20 +99,18 @@ curl -X POST localhost:5000/organize ...
 | Requirement | Version | Install |
 |-------------|---------|---------|
 | Python | 3.8+ | `python --version` |
-| Flask | Latest | `pip install flask` |
+| Flask | >= 2.3.2 | `pip install -r requirements.txt` |
 
 ---
 
 ## Default Paths
 
-Edit in `mcp_server.py`:
+Edit in `src/mcp_server.py` or use environment variables:
 
-```python
-MOUNT_PATH = "/data"           # Your cloud mount
-DOCUMENTS_PATH = "/home/user/Documents"
-DOWNLOADS_PATH = "/home/user/Downloads"
-VAULT_PATH = ""              # Obsidian vault (optional)
-BACKUP_PATH = "/data/backup" # Backup location
+```bash
+export FILE_ORG_WIZ_MOUNT=/your/mount
+export FILE_ORG_WIZ_BACKUP=/your/backup
+export FILE_ORG_WIZ_VAULT=/your/vault
 ```
 
 ---
@@ -123,8 +121,8 @@ BACKUP_PATH = "/data/backup" # Backup location
 
 ```bash
 cd /path/to/file-org-wiz
-pip install flask
-python mcp_server.py --port 5000 --mount /tmp/test --backup /tmp/backup &
+pip install -r requirements.txt
+python src/mcp_server.py --port 5000 --mount /tmp/test --backup /tmp/backup &
 sleep 2
 
 # Health check
@@ -139,7 +137,7 @@ curl localhost:5000/health
 ```bash
 curl -X POST localhost:5000/organize \
   -H "Content-Type: application/json" \
-  -d '{"mount_path": "/tmp/test", "backup_path": "/tmp/backup", "do_backup": true}'
+  -d '{"mount_path": "/tmp/test", "backup_path": "/tmp/backup", "do_backup": false}'
 
 # Check structure
 ls -la /tmp/test/
@@ -151,6 +149,13 @@ ls -la /tmp/test/
 ```bash
 ls /tmp/test/99_SYSTEM/
 # Should have: File Naming Rules.md Tag Rules.md Vault Rules.md
+```
+
+### Test 4: Run Test Suite
+
+```bash
+pip install pytest
+python -m pytest tests/ -v
 ```
 
 ---
@@ -165,14 +170,13 @@ lsof -i :5000
 
 # Kill and restart
 kill $(lsof -ti:5000)
-python mcp_server.py --port 5001 &
+python src/mcp_server.py --port 5001 &
 ```
 
 ### Permission Denied
 
 ```bash
-chmod +x mcp_server.py
-chmod +x *.sh
+chmod +x src/mcp_server.py
 ```
 
 ### Path Not Found
@@ -188,7 +192,7 @@ Use absolute paths, not relative:
 ### Custom Port
 
 ```bash
-python mcp_server.py --port 5001
+python src/mcp_server.py --port 5001
 ```
 
 ### Environment Variables
@@ -198,14 +202,37 @@ export MOUNT_PATH=/your/mount
 export BACKUP_PATH=/your/backup  
 export VAULT_PATH=/your/vault
 
-python mcp_server.py
+python src/mcp_server.py
 ```
 
 ### Production (gunicorn)
 
 ```bash
 pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 mcp_server:app
+gunicorn -w 4 -b 127.0.0.1:5000 "src.mcp_server:app"
+```
+
+### Production with Nginx
+
+```nginx
+# /etc/nginx/conf.d/file-org-wiz.conf
+upstream file_org_wiz {
+    server 127.0.0.1:5000;
+}
+
+server {
+    listen 443 ssl;
+    server_name file-org-wiz.example.com;
+
+    ssl_certificate /etc/ssl/certs/cert.pem;
+    ssl_certificate_key /etc/ssl/private/key.pem;
+
+    location / {
+        proxy_pass http://file_org_wiz;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
 ```
 
 ---
@@ -219,6 +246,17 @@ gunicorn -w 4 -b 0.0.0.0:5000 mcp_server:app
 | Rules | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Script | N/A | N/A | ✅ | ✅ | N/A |
 | HTTP | ❌ | ❌ | ✅ | ✅ | ✅ |
+
+---
+
+## Security Notes
+
+- Server binds to `localhost` by default
+- CORS is disabled by default
+- All paths are validated to prevent traversal attacks
+- For production, use behind a reverse proxy with authentication
+
+See [SECURITY.md](SECURITY.md) for full security documentation.
 
 ---
 
@@ -236,7 +274,8 @@ gunicorn -w 4 -b 0.0.0.0:5000 mcp_server:app
 
 - `README.md` - Main overview
 - `SKILL.md` - OpenCode skill
-- `mcp_server.py` - MCP server code
+- `src/mcp_server.py` - MCP server code
 - `AI_File_Organization_Agent_Prompt.md` - Full prompt
 - `Why_PARA_Zettelkasten.md` - Methodology explanation
-- `research/` - Source documentation
+- `docs/research/` - Source documentation
+- `docs/templates/` - Note templates

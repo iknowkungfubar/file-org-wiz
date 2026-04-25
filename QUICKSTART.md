@@ -1,4 +1,4 @@
-# file-org-wiz Quick Start Guide
+# Quick Start Guide
 
 > Get organized in 5 minutes.
 
@@ -8,22 +8,22 @@
 
 | You Use | Follow Guide |
 |--------|-------------|
-| Claude Desktop | [install_claude_desktop.md](#claude-desktop) |
-| Claude Code | [install_claude_code.md](#claude-code) |
-| GitHub Copilot | [install_copilot.md](#github-copilot) |
-| OpenAI Codex | [install_codex.md](#codex) |
-| Codeium | [install_codeium.md](#codeium) |
-| Tabnine | [install_tabnine.md](#tabnine) |
-| Cody | [install_cody.md](#cody) |
-| Continue | [install_continue.md](#continue) |
-| Cursor/Windsurf | [install_cursor_windsurf.md](#cursor) |
-| Aider | [install_aider.md](#aider) |
-| OpenCode | [install_opencode.md](#opencode) |
-| Raycast | [install_raycast.md](#raycast) |
-| Mint CLI | [install_mint.md](#mint) |
-| gptme | [install_gptme.md](#gptme) |
-| Amazon Q | [install_amazonq.md](#amazon-q) |
-| Any other AI | [install_mcp_generic.md](#any-ai) |
+| Claude Desktop | [docs/install/claude_desktop.md](docs/install/claude_desktop.md) |
+| Claude Code | [docs/install/claude_code.md](docs/install/claude_code.md) |
+| GitHub Copilot | [docs/install/copilot.md](docs/install/copilot.md) |
+| OpenAI Codex | [docs/install/codex.md](docs/install/codex.md) |
+| Codeium | [docs/install/codeium.md](docs/install/codeium.md) |
+| Tabnine | [docs/install/tabnine.md](docs/install/tabnine.md) |
+| Cody | [docs/install/cody.md](docs/install/cody.md) |
+| Continue | [docs/install/continue.md](docs/install/continue.md) |
+| Cursor/Windsurf | [docs/install/cursor_windsurf.md](docs/install/cursor_windsurf.md) |
+| Aider | [docs/install/aider.md](docs/install/aider.md) |
+| OpenCode | [docs/install/opencode.md](docs/install/opencode.md) |
+| Raycast | [docs/install/raycast.md](docs/install/raycast.md) |
+| Mint CLI | [docs/install/mint.md](docs/install/mint.md) |
+| gptme | [docs/install/gptme.md](docs/install/gptme.md) |
+| Amazon Q | [docs/install/amazonq.md](docs/install/amazonq.md) |
+| Any other AI | [docs/install/mcp_generic.md](docs/install/mcp_generic.md) |
 
 ---
 
@@ -35,11 +35,11 @@
 # 1. Navigate to file-org-wiz
 cd /path/to/file-org-wiz
 
-# 2. Install Flask
-pip install flask
+# 2. Install dependencies
+pip install -r requirements.txt
 
 # 3. Start server
-python mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
+python src/mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
 
 # 4. Test
 curl http://localhost:5000/health
@@ -51,7 +51,7 @@ Check your system guide:
 - **Claude Desktop**: Copy MCP config to `~/Library/Application Support/Claude/mcp_servers/`
 - **OpenCode**: Copy `SKILL.md` to `~/.opencode/skills/file-org-wiz/`
 - **Aider**: Use the provided script
-- See `INSTALL.md` for all systems
+- See [INSTALL.md](INSTALL.md) for all systems
 
 ---
 
@@ -83,10 +83,12 @@ curl -X POST http://localhost:5000/organize \
 
 ```bash
 # Simple organize
-organize /your/mount /your/backup
+curl -X POST localhost:5000/organize \
+  -H "Content-Type: application/json" \
+  -d '{"mount_path": "/your/mount"}'
 
 # Check structure
-curl http://localhost:5000/structure?path=/your/mount
+curl "localhost:5000/structure?path=/your/mount"
 ```
 
 ---
@@ -137,8 +139,8 @@ New files follow: `YYYY-MM-DD__context__description__vNN.ext`
 
 ## Next Steps
 
-1. **Read the User Guide**: [USER_GUIDE.md](./USER_GUIDE.md)
-2. **Check the FAQ**: [FAQ.md](./FAQ.md)
+1. **Read the User Guide**: [USER_GUIDE.md](USER_GUIDE.md)
+2. **Check the FAQ**: [FAQ.md](FAQ.md)
 3. **Daily Use**: Say "organize files at [path]" anytime
 
 ---
@@ -147,10 +149,10 @@ New files follow: `YYYY-MM-DD__context__description__vNN.ext`
 
 | Task | Command |
 |------|---------|
-| Organize | `curl -X POST localhost:5000/organize -d {...}` |
-| Backup | `curl -X POST localhost:5000/backup -d {...}` |
-| Check structure | `curl localhost:5000/structure?path=X` |
-| Apply naming | `curl -X POST localhost:5000/apply-names -d {...}` |
+| Organize | `curl -X POST localhost:5000/organize -H "Content-Type: application/json" -d '{"mount_path": "/mount"}'` |
+| Backup | `curl -X POST localhost:5000/backup -H "Content-Type: application/json" -d '{"source_path": "/mount", "backup_path": "/backup"}'` |
+| Check structure | `curl "localhost:5000/structure?path=/mount"` |
+| Apply naming | `curl -X POST localhost:5000/apply-names -H "Content-Type: application/json" -d '{"file_path": "/file", "context": "proj", "description": "doc"}'` |
 | Health check | `curl localhost:5000/health` |
 
 ---
@@ -159,7 +161,16 @@ New files follow: `YYYY-MM-DD__context__description__vNN.ext`
 
 | Problem | Solution |
 |---------|----------|
-| Server won't start | `pip install flask` |
-| Port in use | Change port: `python mcp_server.py --port 5001` |
+| Server won't start | `pip install -r requirements.txt` |
+| Port in use | Change port: `python src/mcp_server.py --port 5001` |
 | Files not found | Check path is absolute, not `~` |
-| AI doesn't understand | Use system prompt: see `WHY_PARA_ZETTELKASTEN.md` |
+| AI doesn't understand | Use system prompt: see `Why_PARA_Zettelkasten.md` |
+
+---
+
+## Security
+
+- Server binds to localhost by default
+- CORS is disabled by default
+- All paths are validated
+- See [SECURITY.md](SECURITY.md) for details

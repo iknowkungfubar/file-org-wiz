@@ -17,8 +17,9 @@ This skill provides a complete file organization system using the PARA (Projects
 
 When loaded, this skill provides access to:
 
-- `/path/to/skill/AI_File_Organization_Agent_Prompt.md` - The execution prompt
-- `/path/to/skill/Why_PARA_Zettelkasten.md` - Methodology explanation
+- `/path/to/skill/src/mcp_server.py` - The MCP server implementation
+- `/path/to/skill/docs/research/` - Original research documentation
+- `/path/to/skill/docs/templates/` - Note templates
 
 ## Prompt the AI
 
@@ -47,14 +48,43 @@ An AI agent that can:
 - Read/write files
 - Navigate directory structure
 
+## MCP Server Usage
+
+Start the server:
+```bash
+python src/mcp_server.py --port 5000 --mount /path/to/mount --backup /path/to/backup
+```
+
+API endpoints:
+- `GET /health` - Health check
+- `POST /organize` - Execute reorganization
+- `POST /backup` - Create backup
+- `GET /structure` - Get current structure
+- `POST /apply-names` - Apply naming conventions
+
 ## Output Structure
 
 ```
 MOUNT_PATH/
 ├── 00_INBOX/
 ├── 01_PROJECTS/
+│   ├── Projects/
+│   ├── Client-Work/
+│   └── Personal/
 ├── 02_AREAS/
+│   ├── Health/
+│   ├── Finance/
+│   ├── Home/
+│   ├── Learning/
+│   └── Personal/
 ├── 03_RESOURCES/
+│   ├── AI/
+│   ├── Tech/
+│   ├── Career/
+│   ├── Development/
+│   ├── Media/
+│   ├── Reading/
+│   └── Tools/
 ├── 04_ARCHIVE/
 ├── 90_TEMPLATES/
 └── 99_SYSTEM/
@@ -67,6 +97,17 @@ MOUNT_PATH/
 ## Naming Conventions
 
 Pattern: `YYYY-MM-DD__context__description__vNN.ext`
+
+Examples:
+- `2026-04-25__career__resume__v01.docx`
+- `2026-04-24__project__meeting-notes__v01.md`
+
+## Security
+
+- Default binding: localhost only
+- CORS disabled by default
+- Path validation to prevent traversal attacks
+- Backup before any changes
 
 ## Skill Metadata
 
