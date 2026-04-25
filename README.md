@@ -21,6 +21,18 @@ This is a prompt and documentation package to completely reorganize any computer
 | [FAQ.md](./FAQ.md) | Frequently asked questions |
 | [REFERENCE_CARD.md](./REFERENCE_CARD.md) | Print-ready reference |
 | [CHEATSHEET.md](./CHEATSHEET.md) | All commands |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | How to contribute |
+| [templates/README.md](./templates/README.md) | Template pack |
+
+## Templates
+
+| Template | Purpose |
+|----------|---------|
+| `templates/01_meeting.md` | Meeting notes |
+| `templates/02_daily.md` | Daily logging |
+| `templates/03_project_moc.md` | Project hub |
+| `templates/04_area_dashboard.md` | Area dashboard |
+| `templates/05_project_note.md` | Project notes |
 | [Why_PARA_Zettelkasten.md](./Why_PARA_Zettelkasten.md) | Methodology explanation |
 
 ## Installation by System
