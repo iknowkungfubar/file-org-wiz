@@ -21,10 +21,20 @@ pip install flask
 | System | Method | Difficulty | Setup Time |
 |--------|--------|-------------|------------|
 | Claude Desktop | MCP config | Easy | 2 min |
+| Claude Code | Tool config | Easy | 2 min |
 | OpenCode | Skill file | Easy | 1 min |
 | Aider | Script | Easy | 2 min |
 | Cursor/Windsurf | Rules | Easy | 2 min |
 | Codex | Rules/script | Easy | 2 min |
+| GitHub Copilot | Custom instructions | Easy | 2 min |
+| Codeium | Rules file | Easy | 2 min |
+| Tabnine | Rules file | Easy | 2 min |
+| Cody (Sourcegraph) | Rules file | Easy | 2 min |
+| Continue | MCP config | Easy | 2 min |
+| Raycast | Script command | Medium | 3 min |
+| Mint CLI | Tool config | Medium | 3 min |
+| gptme | Commands | Medium | 3 min |
+| Amazon Q | Custom instructions | Easy | 2 min |
 | Any AI | HTTP API | Medium | 3 min |
 
 ---
