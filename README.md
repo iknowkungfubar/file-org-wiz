@@ -4,14 +4,18 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/tests-83%20passed-green)](tests/)
 
 A complete file organization system that provides tools to reorganize any computer's files with consistent structure, naming conventions, and documentation using the PARA (Projects, Areas, Resources, Archive) methodology combined with Zettelkasten principles.
 
 ## Features
 
 - **PARA Folder Structure**: Action-oriented organization by Projects, Areas, Resources, and Archive
+- **Deep File Scanning**: Recursive analysis and intelligent categorization
+- **Duplicate Detection**: Content hash + name similarity matching
 - **Zettelkasten Integration**: MOCs, atomic notes, bidirectional links for Obsidian vaults
 - **MCP Server**: HTTP API for integration with AI coding assistants
+- **dry-Run Mode**: Preview changes before applying
 - **Skill System**: Direct integration with OpenCode and other AI tools
 - **Multi-System Support**: Works with Claude, Copilot, Cursor, Codex, and 15+ other AI systems
 - **Safe by Design**: Path validation, backup-first execution, no data deletion without confirmation
@@ -25,7 +29,7 @@ A complete file organization system that provides tools to reorganize any comput
 
 2. **Start the MCP server**:
    ```bash
-   python mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
+   python src/mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
    ```
 
 3. **Test**:
@@ -33,12 +37,45 @@ A complete file organization system that provides tools to reorganize any comput
    curl http://localhost:5000/health
    ```
 
-4. **Organize your files**:
+4. **Preview (dry-run)**:
+   ```bash
+   curl -X POST http://localhost:5000/organize \
+     -H "Content-Type: application/json" \
+     -d '{"mount_path": "/YOUR/MOUNT", "dry_run": true}'
+   ```
+
+5. **Organize (for real)**:
    ```bash
    curl -X POST http://localhost:5000/organize \
      -H "Content-Type: application/json" \
      -d '{"mount_path": "/YOUR/MOUNT", "backup_path": "/YOUR/BACKUP", "do_backup": true}'
    ```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|------------|
+| `/health` | GET | Health check |
+| `/organize` | POST | Execute reorganization |
+| `/backup` | POST | Create backup |
+| `/structure` | GET | Get directory structure |
+| `/apply-names` | POST | Apply naming convention |
+| `/mcp-manifest` | GET | List available tools |
+
+### Organize Options
+
+```json
+{
+  "mount_path": "/path/to/mount",
+  "backup_path": "/path/to/backup",
+  "do_backup": true,
+  "dry_run": true,
+  "create_vault": false,
+  "vault_path": "/path/to/vault"
+}
+```
+
+With `dry_run: true`, the response includes `suggested_actions` preview.
 
 ## Documentation
 
@@ -56,11 +93,11 @@ A complete file organization system that provides tools to reorganize any comput
 
 | Template | Purpose |
 |----------|---------|
-| `templates/01_meeting.md` | Meeting notes |
-| `templates/02_daily.md` | Daily logging |
-| `templates/03_project_moc.md` | Project hub |
-| `templates/04_area_dashboard.md` | Area dashboard |
-| `templates/05_project_note.md` | Project notes |
+| `docs/templates/01_meeting.md` | Meeting notes |
+| `docs/templates/02_daily.md` | Daily logging |
+| `docs/templates/03_project_moc.md` | Project hub |
+| `docs/templates/04_area_dashboard.md` | Area dashboard |
+| `docs/templates/05_project_note.md` | Project notes |
 
 ## Installation by System
 

@@ -357,7 +357,7 @@ def health_check() -> Response:
     return jsonify({
         "status": "healthy",
         "service": "file-org-wiz-mcp",
-        "version": "1.0.0"
+        "version": "1.1.0"
     })
 
 
@@ -583,7 +583,7 @@ def mcp_manifest() -> Response:
     """MCP manifest - tools available."""
     return jsonify({
         "name": "file-org-wiz",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "tools": [
             {
                 "name": "organize",
