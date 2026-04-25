@@ -9,6 +9,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Any, Dict, List
 
+try:
+    from file_intelligence import generate_content_tags, suggest_smart_filename
+except ImportError:
+    generate_content_tags = None
+    suggest_smart_filename = None
+
 
 # File type to PARA category mapping
 FILE_TYPE_CATEGORIES = {
@@ -195,6 +201,10 @@ def scan_and_categorize(base_path, max_depth=10, use_date=True):
         file_info["category"] = classification["category"]
         file_info["confidence"] = classification["confidence"]
         file_info["reason"] = classification["reason"]
+        if generate_content_tags:
+            file_info["tags"] = generate_content_tags(file_info.get("path", ""))
+        if suggest_smart_filename:
+            file_info["suggested_name"] = suggest_smart_filename(file_info.get("path", ""))
         
         categorized.append(file_info)
         

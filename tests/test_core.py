@@ -11,7 +11,8 @@ from mcp_server import (
     create_folder_structure,
     create_backup,
     get_directory_structure,
-    apply_naming_convention
+    apply_naming_convention,
+    create_template_structure,
 )
 
 
@@ -156,3 +157,22 @@ class TestApplyNamingConvention:
         assert result["success"] is True
         # Context should be lowercase with no spaces
         assert "__project" in result["renamed"].lower()
+
+
+class TestCreateTemplateStructure:
+    """Tests for template folder generation."""
+
+    def test_creates_finance_template(self, mount_dir):
+        create_folder_structure(mount_dir)
+
+        result = create_template_structure(mount_dir, "finance")
+
+        assert result["errors"] == []
+        assert any(path.endswith("02_AREAS/Finance/Invoices") for path in result["created"])
+        assert os.path.exists(os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices"))
+
+    def test_unknown_template_returns_error(self, mount_dir):
+        result = create_template_structure(mount_dir, "unknown")
+
+        assert result["created"] == []
+        assert result["errors"]

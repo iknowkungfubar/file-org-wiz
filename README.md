@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-83%20passed-green)](tests/)
+[![Tests](https://img.shields.io/badge/tests-93%20passed-green)](tests/)
 
 A complete file organization system that provides tools to reorganize any computer's files with consistent structure, naming conventions, and documentation using the PARA (Projects, Areas, Resources, Archive) methodology combined with Zettelkasten principles.
 
@@ -15,6 +15,10 @@ A complete file organization system that provides tools to reorganize any comput
 - **Duplicate Detection**: Content hash + name similarity matching
 - **Zettelkasten Integration**: MOCs, atomic notes, bidirectional links for Obsidian vaults
 - **MCP Server**: HTTP API for integration with AI coding assistants
+- **Natural Language Commands**: Parse requests like "organize my downloads folder"
+- **Auto-Tagging**: Generate semantic tags from filenames and readable file content
+- **Smart Renaming**: Infer better filenames from content with `auto_describe`
+- **Templates**: Apply finance, research, and media folder templates instantly
 - **dry-Run Mode**: Preview changes before applying
 - **Skill System**: Direct integration with OpenCode and other AI tools
 - **Multi-System Support**: Works with Claude, Copilot, Cursor, Codex, and 15+ other AI systems
@@ -60,6 +64,8 @@ A complete file organization system that provides tools to reorganize any comput
 | `/backup` | POST | Create backup |
 | `/structure` | GET | Get directory structure |
 | `/apply-names` | POST | Apply naming convention |
+| `/analyze-file` | POST | Generate tags and smart filename suggestion |
+| `/nlp-command` | POST | Parse or execute natural language requests |
 | `/mcp-manifest` | GET | List available tools |
 
 ### Organize Options
@@ -69,6 +75,7 @@ A complete file organization system that provides tools to reorganize any comput
   "mount_path": "/path/to/mount",
   "backup_path": "/path/to/backup",
   "do_backup": true,
+  "template": "finance",
   "dry_run": true,
   "create_vault": false,
   "vault_path": "/path/to/vault"
@@ -76,6 +83,24 @@ A complete file organization system that provides tools to reorganize any comput
 ```
 
 With `dry_run: true`, the response includes `suggested_actions` preview.
+
+### Smart Naming
+
+```json
+{
+  "file_path": "/path/to/file.txt",
+  "auto_describe": true,
+  "version": 1
+}
+```
+
+### Natural Language Commands
+
+```bash
+curl -X POST http://localhost:5000/nlp-command \
+  -H "Content-Type: application/json" \
+  -d '{"command": "preview organize my downloads folder"}'
+```
 
 ## Documentation
 

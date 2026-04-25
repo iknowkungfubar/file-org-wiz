@@ -37,7 +37,7 @@ class TestHealthEndpoint:
         data = json.loads(response.data)
 
         assert "version" in data
-        assert data["version"] == "1.1.0"
+        assert data["version"] == "1.2.0"
 
 
 class TestOrganizeEndpoint:
@@ -88,6 +88,21 @@ class TestOrganizeEndpoint:
         phases = data.get("phases", [])
         backup_phase = next((p for p in phases if p["name"] == "backup"), None)
         assert backup_phase is not None
+
+    def test_organize_applies_template(self, client, mount_dir, backup_dir):
+        response = client.post("/organize", json={
+            "mount_path": mount_dir,
+            "backup_path": backup_dir,
+            "do_backup": False,
+            "template": "finance",
+        })
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        phases = data.get("phases", [])
+        template_phase = next((p for p in phases if p["name"] == "apply_template"), None)
+        assert template_phase is not None
+        assert os.path.exists(os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices"))
 
 
 class TestBackupEndpoint:
@@ -205,3 +220,40 @@ class TestMCPManifestEndpoint:
 
         tool_names = [t["name"] for t in data["tools"]]
         assert "organize" in tool_names
+
+
+class TestNlpCommandEndpoint:
+    """Tests for /nlp-command endpoint."""
+
+    def test_nlp_command_requires_command(self, client):
+        response = client.post("/nlp-command", json={})
+        data = json.loads(response.data)
+
+        assert response.status_code == 400
+        assert "error" in data
+
+    def test_nlp_command_parses_find_request(self, client):
+        response = client.post("/nlp-command", json={
+            "command": "find all PDF files from last month"
+        })
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["status"] == "parsed"
+        assert data["parsed_command"]["action"] == "find"
+        assert "pdf" in data["parsed_command"]["filters"]["file_types"]
+
+    def test_apply_names_can_auto_describe(self, client, mount_dir):
+        test_file = os.path.join(mount_dir, "scan001.txt")
+        with open(test_file, "w", encoding="utf-8") as handle:
+            handle.write("Invoice for April website project. Client tax summary enclosed.")
+
+        response = client.post("/apply-names", json={
+            "file_path": test_file,
+            "auto_describe": True,
+        })
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["success"] is True
+        assert "invoice" in os.path.basename(data["renamed"]).lower() or "finance" in os.path.basename(data["renamed"]).lower()

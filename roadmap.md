@@ -4,7 +4,7 @@
 
 ---
 
-## Status: COMPLETED (v1.1.0)
+## Status: COMPLETED (v1.2.0)
 
 All roadmap items have been implemented:
 
@@ -17,7 +17,7 @@ All roadmap items have been implemented:
 | 1 | Atomic Note Creator | ✅ Implemented |
 | 1 | Link Scanner | ✅ Implemented |
 | 2 | Dry-Run Mode | ✅ Implemented |
-| 2 | Tests | ✅ 83 tests passing |
+| 2 | Tests | ✅ 93 tests passing |
 
 ---
 
@@ -277,4 +277,104 @@ src/
 ---
 
 *Last Updated: 2026-04-25*
-*Status: COMPLETED (v1.1.0)*
+*Status: COMPLETED (v1.2.0)*
+
+---
+
+## Priority 0: Critical Enhancements (Immediate)
+
+### Issue 0.3: Natural Language Processing for Commands ✅ COMPLETED
+**Problem:** Users currently need to use specific API endpoints with JSON parameters, which can be cumbersome for casual users.
+
+**Solution:** Add natural language processing to understand conversational commands like "organize my downloads folder" or "find all PDF invoices from last month." (Implemented via `/nlp-command` and `src/nlp_processor.py`.)
+
+### Issue 0.4: Content-Based Auto-Tagging System ✅ COMPLETED
+**Problem:** Current system relies on filename patterns and extensions for categorization, missing rich semantic understanding of file content.
+
+**Solution:** Implement AI-powered content analysis to automatically tag files based on their actual content (text, image descriptions, document topics). (Implemented in `src/file_intelligence.py` and exposed through `/analyze-file` plus dry-run suggestions.)
+
+### Issue 0.5: Smart File Renaming with AI Content Analysis ✅ COMPLETED
+**Problem:** Current naming convention is rule-based but doesn't understand file content to generate meaningful names.
+
+**Solution:** Add AI-powered file renaming that analyzes content to generate descriptive, searchable filenames like "2024-q4-tax-return-w2.pdf" instead of "scan001.pdf". (Implemented via `auto_describe` support on `/apply-names`.)
+
+---
+
+## Priority 1: Core Functionality (High)
+
+### Feature 1.4: MCP Agent for Direct AI Tool Integration ✅ COMPLETED
+**Description:** Create specialized MCP agents that allow AI coding assistants (Claude, Cursor, Codex) to directly interact with the file organization system through natural language.
+
+**Implementation:**
+- Add dedicated endpoints for common AI agent workflows
+- Provide contextual awareness of current projects and tasks
+- Enable bi-directional communication for intelligent file suggestions
+
+Implemented with the `/nlp-command` endpoint and manifest exposure for AI assistants.
+
+### Feature 1.5: Visual Knowledge Graph for File Relationships ✅ PLANNED
+**Description:** Generate interactive visual graphs showing relationships between files based on content analysis, tags, and user-defined connections.
+
+**Research Sources:**
+- Obsidian Graph View
+- Heptabase visual thinking
+- Capacities object-based PKM
+
+**Implementation:**
+```
+For files with shared tags/content:
+    Generate force-directed graph visualization
+    Node size = file importance/relevance
+    Edge thickness = relationship strength
+    Click to open/file actions
+```
+
+### Feature 1.6: Automated Workflow Scheduling ✅ PLANNED
+**Description:** Allow users to schedule organization workflows to run automatically at specified intervals or triggers.
+
+**Implementation:**
+- Cron-like scheduling interface
+- Trigger-based organization (file added, time-based)
+- Notification system for completed workflows
+- Integration with system schedulers (launchd, cron, Task Scheduler)
+
+### Feature 1.7: Cross-Platform Cloud Storage Integration ✅ PLANNED
+**Description:** Extend beyond local files to integrate with major cloud storage providers (Google Drive, Dropbox, OneDrive).
+
+**Research Sources:**
+- Dropbox AI Agent
+- SortifAI universal cloud support
+- OpenClaw multi-provider support
+
+**Implementation:**
+- OAuth 2.0 authentication for cloud providers
+- Unified API for local and cloud file operations
+- Sync capabilities between local and cloud storage
+- Support for Google Drive, Dropbox, OneDrive, S3
+
+---
+
+## Priority 2: UX Improvements (Medium)
+
+### Feature 2.4: Template-Based Organization ✅ COMPLETED
+**Description:** Provide pre-built templates for common use cases (project management, personal finance, research, media libraries).
+
+**Implementation:**
+- Template library with predefined folder structures
+- Rule sets for automatic organization
+- One-click application of templates to directories
+- Community template sharing
+
+Implemented with built-in `finance`, `research`, and `media` templates on `/organize`.
+
+### Feature 2.5: File Analytics Dashboard ✅ PLANNED
+**Description:** Provide insights about file usage patterns, storage consumption, and organization effectiveness.
+
+**Metrics:**
+- File type distribution
+- Storage usage by category
+- Duplicate file savings
+- Organization completion percentage
+- Access frequency heatmaps
+
+---
