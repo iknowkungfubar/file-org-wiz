@@ -11,6 +11,7 @@ Endpoints:
   - POST /organize        - Execute reorganization
   - POST /backup          - Create backup
   - GET  /structure       - Get current structure
+  - GET  /analytics       - Get organization analytics
   - POST /apply-names     - Apply naming conventions
   - GET  /mcp-manifest    - List available tools
 
@@ -24,6 +25,7 @@ import os
 import re
 import shutil
 import json
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Any
@@ -323,6 +325,70 @@ def create_template_structure(base_path: str, template: str) -> dict[str, list[s
     return {"created": created, "errors": errors}
 
 
+def create_analytics_report(base_path: str) -> dict[str, Any]:
+    """Generate analytics for a directory tree."""
+    valid, error = validate_path(base_path)
+    if not valid:
+        return {"error": error}
+
+    file_types: Counter[str] = Counter()
+    tag_counts: Counter[str] = Counter()
+    largest_files: list[dict[str, Any]] = []
+    para_files = 0
+    total_size_bytes = 0
+
+    categorized = {"files": [], "summary": {}}
+    if scan_and_categorize:
+        categorized = scan_and_categorize(base_path, use_date=True)
+
+    for file_info in categorized.get("files", []):
+        extension = file_info.get("extension", "") or "no_extension"
+        file_types[extension] += 1
+        total_size_bytes += int(file_info.get("size", 0))
+        relative_path = os.path.relpath(file_info.get("path", ""), base_path)
+        top_level = relative_path.split(os.sep, 1)[0] if relative_path else ""
+        if top_level in PARA_FOLDERS:
+            para_files += 1
+        for tag in file_info.get("tags", []):
+            tag_counts[tag] += 1
+        largest_files.append({
+            "path": file_info.get("path", ""),
+            "size": file_info.get("size", 0),
+            "category": file_info.get("category", ""),
+        })
+
+    largest_files.sort(key=lambda item: item["size"], reverse=True)
+
+    duplicate_summary = {
+        "duplicate_groups": 0,
+        "total_duplicates": 0,
+        "total_wasted_bytes": 0,
+    }
+    if find_all_duplicates:
+        duplicates = find_all_duplicates(base_path, by_content=True, by_name=True)
+        duplicate_summary = {
+            "duplicate_groups": duplicates.get("duplicate_groups", 0),
+            "total_duplicates": duplicates.get("total_duplicates", 0),
+            "total_wasted_bytes": duplicates.get("total_wasted_bytes", 0),
+        }
+
+    total_files = categorized.get("total_files", 0)
+    organization_percentage = round((para_files / total_files) * 100, 2) if total_files else 0.0
+
+    return {
+        "path": base_path,
+        "total_files": total_files,
+        "total_size_bytes": total_size_bytes,
+        "file_types": dict(file_types),
+        "category_distribution": categorized.get("summary", {}),
+        "top_tags": [{"tag": tag, "count": count} for tag, count in tag_counts.most_common(10)],
+        "largest_files": largest_files[:5],
+        "organization_percentage": organization_percentage,
+        "duplicates": duplicate_summary,
+        "generated_at": datetime.now().isoformat(),
+    }
+
+
 def get_directory_structure(path: str, max_depth: int = 3) -> dict[str, Any]:
     """Get current directory structure with depth limit."""
     # Validate path
@@ -412,7 +478,7 @@ def health_check() -> Response:
     return jsonify({
         "status": "healthy",
         "service": "file-org-wiz-mcp",
-        "version": "1.2.0"
+        "version": "1.3.0"
     })
 
 
@@ -599,6 +665,18 @@ def structure_endpoint() -> tuple[Response, int]:
         max_depth = 3
 
     return jsonify(get_directory_structure(path, max_depth)), 200
+
+
+@app.route("/analytics", methods=["GET"])
+def analytics_endpoint() -> tuple[Response, int]:
+    """Get file organization analytics for a directory."""
+    path = request.args.get("path", MOUNT_PATH)
+
+    valid, error = validate_path(path)
+    if not valid:
+        return jsonify({"error": f"Invalid path: {error}"}), 400
+
+    return jsonify(create_analytics_report(path)), 200
 
 
 @app.route("/apply-names", methods=["POST"])
@@ -877,7 +955,7 @@ def mcp_manifest() -> Response:
     """MCP manifest - tools available."""
     return jsonify({
         "name": "file-org-wiz",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "tools": [
             {
                 "name": "organize",
@@ -913,6 +991,16 @@ def mcp_manifest() -> Response:
                     "properties": {
                         "path": {"type": "string"},
                         "max_depth": {"type": "integer"}
+                    }
+                }
+            },
+            {
+                "name": "analytics",
+                "description": "Get file organization analytics and dashboard metrics",
+                "input": {
+                    "type": "object",
+                    "properties": {
+                        "path": {"type": "string"}
                     }
                 }
             },

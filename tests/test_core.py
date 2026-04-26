@@ -13,6 +13,7 @@ from mcp_server import (
     get_directory_structure,
     apply_naming_convention,
     create_template_structure,
+    create_analytics_report,
 )
 
 
@@ -176,3 +177,31 @@ class TestCreateTemplateStructure:
 
         assert result["created"] == []
         assert result["errors"]
+
+
+class TestCreateAnalyticsReport:
+    """Tests for analytics report generation."""
+
+    def test_reports_file_totals_and_distribution(self, mount_dir):
+        with open(os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8") as handle:
+            handle.write("invoice")
+        with open(os.path.join(mount_dir, "notes.md"), "w", encoding="utf-8") as handle:
+            handle.write("notes")
+
+        result = create_analytics_report(mount_dir)
+
+        assert result["total_files"] == 2
+        assert result["file_types"]["pdf"] == 1
+        assert result["file_types"]["md"] == 1
+        assert result["total_size_bytes"] > 0
+
+    def test_reports_duplicate_metrics(self, mount_dir):
+        with open(os.path.join(mount_dir, "copy-a.txt"), "w", encoding="utf-8") as handle:
+            handle.write("same-content")
+        with open(os.path.join(mount_dir, "copy-b.txt"), "w", encoding="utf-8") as handle:
+            handle.write("same-content")
+
+        result = create_analytics_report(mount_dir)
+
+        assert result["duplicates"]["duplicate_groups"] >= 1
+        assert result["duplicates"]["total_duplicates"] >= 2

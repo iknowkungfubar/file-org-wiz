@@ -37,7 +37,7 @@ class TestHealthEndpoint:
         data = json.loads(response.data)
 
         assert "version" in data
-        assert data["version"] == "1.2.0"
+        assert data["version"] == "1.3.0"
 
 
 class TestOrganizeEndpoint:
@@ -159,6 +159,31 @@ class TestStructureEndpoint:
         # Should return success but include error info
         assert response.status_code == 200
         assert "error" in data or "structure" in data
+
+
+class TestAnalyticsEndpoint:
+    """Tests for /analytics endpoint."""
+
+    def test_analytics_returns_metrics(self, client, mount_dir):
+        with open(os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8") as handle:
+            handle.write("invoice total")
+        with open(os.path.join(mount_dir, "notes.md"), "w", encoding="utf-8") as handle:
+            handle.write("meeting notes")
+
+        response = client.get(f"/analytics?path={mount_dir}")
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["total_files"] == 2
+        assert data["file_types"]["pdf"] == 1
+        assert "category_distribution" in data
+
+    def test_analytics_with_invalid_path(self, client):
+        response = client.get("/analytics?path=/etc/passwd")
+        data = json.loads(response.data)
+
+        assert response.status_code == 400
+        assert "error" in data
 
 
 class TestApplyNamesEndpoint:

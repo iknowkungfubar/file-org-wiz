@@ -4,7 +4,7 @@
 
 ---
 
-## Status: COMPLETED (v1.2.0)
+## Status: COMPLETED (v1.3.0)
 
 All roadmap items have been implemented:
 
@@ -17,7 +17,7 @@ All roadmap items have been implemented:
 | 1 | Atomic Note Creator | ✅ Implemented |
 | 1 | Link Scanner | ✅ Implemented |
 | 2 | Dry-Run Mode | ✅ Implemented |
-| 2 | Tests | ✅ 93 tests passing |
+| 2 | Tests | ✅ 97 tests passing |
 
 ---
 
@@ -277,7 +277,7 @@ src/
 ---
 
 *Last Updated: 2026-04-25*
-*Status: COMPLETED (v1.2.0)*
+*Status: COMPLETED (v1.3.0)*
 
 ---
 
@@ -367,7 +367,7 @@ For files with shared tags/content:
 
 Implemented with built-in `finance`, `research`, and `media` templates on `/organize`.
 
-### Feature 2.5: File Analytics Dashboard ✅ PLANNED
+### Feature 2.5: File Analytics Dashboard ✅ COMPLETED
 **Description:** Provide insights about file usage patterns, storage consumption, and organization effectiveness.
 
 **Metrics:**
@@ -376,5 +376,7 @@ Implemented with built-in `finance`, `research`, and `media` templates on `/orga
 - Duplicate file savings
 - Organization completion percentage
 - Access frequency heatmaps
+
+Implemented with the `/analytics` endpoint and `create_analytics_report()` dashboard summary.
 
 ---
