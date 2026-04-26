@@ -19,10 +19,11 @@ python mcp_server.py --port 5000 --mount /path/to/mount --backup /path/to/backup
 | Flag | Default | Description |
 |------|---------|-----------|
 | `--port` | 5000 | Port to run server |
-| `--host` | 0.0.0.0 | Host to bind |
+| `--host` | 127.0.0.1 | Host to bind (localhost for security) |
 | `--mount` | /data | Default mount path |
 | `--backup` | /data/backup | Backup location |
 | `--vault` | (empty) | Obsidian vault path |
+| `--template` | (none) | Template to apply (finance, research, media) |
 
 ## MCP Endpoints
 
@@ -53,7 +54,12 @@ POST /backup
 
 ### Get Structure
 ```bash
-GET /structure?path=/path/to/dir
+GET /structure?path=/path/to/dir&max_depth=3
+```
+
+### Get Analytics
+```bash
+GET /analytics?path=/path/to/mount
 ```
 
 ### Apply Naming Convention
@@ -64,6 +70,22 @@ POST /apply-names
   "context": "project",
   "description": "my-document",
   "version": 1
+}
+```
+
+### Auto-Describe File
+```bash
+POST /analyze-file
+{
+  "file_path": "/path/to/file.pdf"
+}
+```
+
+### Natural Language Command
+```bash
+POST /nlp-command
+{
+  "command": "organize my downloads folder"
 }
 ```
 

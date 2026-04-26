@@ -123,5 +123,5 @@ curl -X POST localhost:5000/apply-names -d '{
 
 ---
 
-*file-org-wiz v1.0.0*
+*file-org-wiz v1.3.0*
 *Keep this card visible!*
