@@ -119,8 +119,8 @@ TEMPLATE_STRUCTURES: dict[str, list[str]] = {
 
 # Sensitive prefixes that should never be accessible
 SENSITIVE_PREFIXES: tuple[str, ...] = (
-    "/etc/", "/sys/", "/proc/", "/dev/",
-    "/boot/", "/root/", "/.ssh/", "/.aws/",
+    "/etc", "/sys", "/proc", "/dev",
+    "/boot", "/root", "/.ssh", "/.aws",
 )
 
 # =============================================================================
@@ -150,8 +150,8 @@ def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
 
     # Block any path starting with a sensitive prefix (no exceptions)
     for prefix in SENSITIVE_PREFIXES:
-        if abs_path.startswith(prefix):
-            return False, f"Access to {prefix.rstrip('/')} is restricted"
+        if abs_path == prefix or abs_path.startswith(prefix + "/"):
+            return False, f"Access to {prefix} is restricted"
 
     return True, ""
 
