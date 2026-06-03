@@ -40,19 +40,19 @@ class TestValidatePath:
         """/etc/passwd access should be rejected."""
         valid, error = validate_path("/etc/passwd")
         assert valid is False
-        assert "not allowed" in error.lower()
+        assert "restricted" in error.lower()
 
     def test_ssh_path_rejected(self):
         """SSH directory access should be rejected."""
         valid, error = validate_path("/.ssh")
         assert valid is False
-        assert "not allowed" in error.lower()
+        assert "restricted" in error.lower()
 
     def test_proc_rejected(self):
         """/proc access should be rejected."""
         valid, error = validate_path("/proc")
         assert valid is False
-        assert "not allowed" in error.lower() or "restricted" in error.lower()
+        assert "restricted" in error.lower()
 
 
 class TestSafeJoinPath:
