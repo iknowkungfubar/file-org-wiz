@@ -52,9 +52,11 @@ def client():
     """Create a test client for the Flask app."""
     # Import here to avoid circular imports
     import sys
+
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
     from mcp_server import app
+
     app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
@@ -64,8 +66,10 @@ def client():
 def app():
     """Create a test Flask app."""
     import sys
+
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
     from mcp_server import app
+
     app.config["TESTING"] = True
     return app

@@ -13,7 +13,7 @@ from typing import Any
 # =============================================================================
 
 
-WIKILINK_PATTERN = re.compile(r'\[\[([^\]]+)\]\]')
+WIKILINK_PATTERN = re.compile(r"\[\[([^\]]+)\]\]")
 
 
 def extract_wikilinks(content: str) -> list[str]:
@@ -23,7 +23,7 @@ def extract_wikilinks(content: str) -> list[str]:
     links = []
     for match in matches:
         # Handle [[link|alias]] format
-        link = match.split('|')[0].strip()
+        link = match.split("|")[0].strip()
         links.append(link)
     return links
 
@@ -31,7 +31,7 @@ def extract_wikilinks(content: str) -> list[str]:
 def extract_wikilinks_from_file(file_path: str) -> list[str]:
     """Extract wikilinks from a markdown file."""
     try:
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
         return extract_wikilinks(content)
     except OSError:
@@ -75,42 +75,38 @@ def generate_moc_content(topic_name: str, notes: list[str], add_wikilinks: bool 
             lines.append(f"- {note_name}")
 
     # Add metadata
-    lines.extend([
-        "",
-        "---",
-        f"generated: {datetime.now().isoformat()}",
-        f"note_count: {len(notes)}",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            f"generated: {datetime.now().isoformat()}",
+            f"note_count: {len(notes)}",
+        ]
+    )
 
     return "\n".join(lines)
 
 
 def create_moc_file(
-    output_dir: str,
-    topic_name: str,
-    notes: list[str],
-    add_wikilinks: bool = True
+    output_dir: str, topic_name: str, notes: list[str], add_wikilinks: bool = True
 ) -> str:
     """Create a MOC file for a topic."""
     # Sanitize topic name for filename
-    safe_name = re.sub(r'[^a-zA-Z0-9\s-]', '', topic_name)
-    safe_name = safe_name.strip().replace(' ', '-')
+    safe_name = re.sub(r"[^a-zA-Z0-9\s-]", "", topic_name)
+    safe_name = safe_name.strip().replace(" ", "-")
 
     filename = f"{safe_name}-MOC.md"
     output_path = os.path.join(output_dir, filename)
 
     content = generate_moc_content(topic_name, notes, add_wikilinks)
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(content)
 
     return output_path
 
 
-def scan_for_moc_candidates(
-    vault_path: str,
-    min_notes: int = 5
-) -> dict[str, list[str]]:
+def scan_for_moc_candidates(vault_path: str, min_notes: int = 5) -> dict[str, list[str]]:
     """
     Find folders that need MOC files.
 
@@ -121,10 +117,10 @@ def scan_for_moc_candidates(
     try:
         for root, dirs, files in os.walk(vault_path):
             # Get markdown files
-            md_files = [f for f in files if f.endswith('.md')]
+            md_files = [f for f in files if f.endswith(".md")]
 
             # Skip system files
-            md_files = [f for f in md_files if not f.startswith('.')]
+            md_files = [f for f in md_files if not f.startswith(".")]
 
             if len(md_files) >= min_notes:
                 folder_name = os.path.basename(root) or "root"
@@ -157,16 +153,20 @@ def generate_all_mocs(vault_path: str, output_path: str | None = None) -> dict[s
     for folder, notes in candidates.items():
         try:
             path = create_moc_file(output_path, folder, notes)
-            generated.append({
-                "folder": folder,
-                "note_count": len(notes),
-                "moc_path": path,
-            })
+            generated.append(
+                {
+                    "folder": folder,
+                    "note_count": len(notes),
+                    "moc_path": path,
+                }
+            )
         except OSError as e:
-            errors.append({
-                "folder": folder,
-                "error": str(e),
-            })
+            errors.append(
+                {
+                    "folder": folder,
+                    "error": str(e),
+                }
+            )
 
     return {
         "vault_path": vault_path,
@@ -183,9 +183,7 @@ def generate_all_mocs(vault_path: str, output_path: str | None = None) -> dict[s
 
 
 def find_similar_notes(
-    target_note: dict[str, Any],
-    all_notes: list[dict[str, Any]],
-    min_similarity: float = 0.3
+    target_note: dict[str, Any], all_notes: list[dict[str, Any]], min_similarity: float = 0.3
 ) -> list[dict[str, Any]]:
     """
     Find notes similar to target note based on content keywords.
@@ -193,10 +191,10 @@ def find_similar_notes(
     Simple keyword-based similarity (not full NLP).
     """
     target_content = target_note.get("content", "").lower()
-    target_words = set(re.findall(r'\b[a-z]{4,}\b', target_content))
+    target_words = set(re.findall(r"\b[a-z]{4,}\b", target_content))
 
     # Remove common words
-    stop_words = {'that', 'this', 'with', 'from', 'have', 'were', 'been', 'they'}
+    stop_words = {"that", "this", "with", "from", "have", "were", "been", "they"}
     target_words = target_words - stop_words
 
     if not target_words:
@@ -209,7 +207,7 @@ def find_similar_notes(
             continue
 
         note_content = note.get("content", "").lower()
-        note_words = set(re.findall(r'\b[a-z]{4,}\b', note_content))
+        note_words = set(re.findall(r"\b[a-z]{4,}\b", note_content))
         note_words = note_words - stop_words
 
         # Calculate Jaccard similarity
@@ -219,11 +217,13 @@ def find_similar_notes(
             similarity = intersection / union if union > 0 else 0
 
             if similarity >= min_similarity:
-                similar.append({
-                    "path": note.get("path"),
-                    "similarity": similarity,
-                    "shared_keywords": list(target_words & note_words),
-                })
+                similar.append(
+                    {
+                        "path": note.get("path"),
+                        "similarity": similarity,
+                        "shared_keywords": list(target_words & note_words),
+                    }
+                )
 
     # Sort by similarity
     similar.sort(key=lambda x: x["similarity"], reverse=True)
@@ -274,12 +274,14 @@ def analyze_links(notes: list[dict[str, Any]]) -> dict[str, Any]:
     for path in graph:
         total_links = len(graph[path]) + len(backlinks[path])
         if total_links >= 3:  # At least 3 connections
-            hub_notes.append({
-                "path": path,
-                "connections": total_links,
-                "outgoing": len(graph[path]),
-                "incoming": len(backlinks[path]),
-            })
+            hub_notes.append(
+                {
+                    "path": path,
+                    "connections": total_links,
+                    "outgoing": len(graph[path]),
+                    "incoming": len(backlinks[path]),
+                }
+            )
 
     # Sort by connections
     hub_notes.sort(key=lambda x: x["connections"], reverse=True)
@@ -295,10 +297,7 @@ def analyze_links(notes: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def suggest_links(
-    note_path: str,
-    content: str,
-    all_notes: list[dict[str, Any]],
-    max_suggestions: int = 5
+    note_path: str, content: str, all_notes: list[dict[str, Any]], max_suggestions: int = 5
 ) -> list[dict[str, Any]]:
     """
     Suggest links for a note based on content similarity.
@@ -312,11 +311,13 @@ def suggest_links(
 
     suggestions = []
     for s in similar[:max_suggestions]:
-        suggestions.append({
-            "path": s["path"],
-            "confidence": s["similarity"],
-            "reason": f"shared keywords: {', '.join(s['shared_keywords'][:3])}",
-        })
+        suggestions.append(
+            {
+                "path": s["path"],
+                "confidence": s["similarity"],
+                "reason": f"shared keywords: {', '.join(s['shared_keywords'][:3])}",
+            }
+        )
 
     return suggestions
 
@@ -327,9 +328,7 @@ def suggest_links(
 
 
 def split_atomic_notes(
-    content: str,
-    original_name: str,
-    id_prefix: str = ""
+    content: str, original_name: str, id_prefix: str = ""
 ) -> list[dict[str, Any]]:
     """
     Split a note into atomic (one idea each) notes.
@@ -348,16 +347,18 @@ def split_atomic_notes(
             body = parts[2]
 
     # Find all heading sections
-    heading_pattern = re.compile(r'^#{1,6}\s+(.+)$', re.MULTILINE)
+    heading_pattern = re.compile(r"^#{1,6}\s+(.+)$", re.MULTILINE)
     matches = list(heading_pattern.finditer(body))
 
     if not matches:
         # No headings - return as single note
-        return [{
-            "content": content,
-            "title": original_name,
-            "id": id_prefix or datetime.now().strftime("%Y%m%d%H%M%S"),
-        }]
+        return [
+            {
+                "content": content,
+                "title": original_name,
+                "id": id_prefix or datetime.now().strftime("%Y%m%d%H%M%S"),
+            }
+        ]
 
     # Split at each heading
     notes = []
@@ -379,19 +380,18 @@ def split_atomic_notes(
         if frontmatter:
             section_content = f"---\n{frontmatter}---\n\n{section_content}"
 
-        notes.append({
-            "content": section_content,
-            "title": section_title,
-            "id": section_id,
-        })
+        notes.append(
+            {
+                "content": section_content,
+                "title": section_title,
+                "id": section_id,
+            }
+        )
 
     return notes
 
 
-def create_atomic_notes(
-    output_dir: str,
-    source_note: dict[str, Any]
-) -> list[str]:
+def create_atomic_notes(output_dir: str, source_note: dict[str, Any]) -> list[str]:
     """
     Create atomic notes from a source note.
 
@@ -416,13 +416,13 @@ def create_atomic_notes(
 
     for atom in atoms:
         # Create filename
-        safe_title = re.sub(r'[^a-zA-Z0-9\s-]', '', atom["title"])
-        safe_title = safe_title.strip().replace(' ', '-')
+        safe_title = re.sub(r"[^a-zA-Z0-9\s-]", "", atom["title"])
+        safe_title = safe_title.strip().replace(" ", "-")
 
         filename = f"{atom['id']}-{safe_title}.md"
         output_path = os.path.join(output_dir, filename)
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(atom["content"])
 
         created.append(output_path)
@@ -443,10 +443,10 @@ def get_vault_stats(vault_path: str) -> dict[str, Any]:
     try:
         for root, dirs, files in os.walk(vault_path):
             for f in files:
-                if f.endswith('.md'):
+                if f.endswith(".md"):
                     path = os.path.join(root, f)
                     try:
-                        with open(path, encoding='utf-8') as file:
+                        with open(path, encoding="utf-8") as file:
                             content = file.read()
 
                         # Count words
@@ -456,12 +456,14 @@ def get_vault_stats(vault_path: str) -> dict[str, Any]:
                         # Extract links
                         links = extract_wikilinks(content)
 
-                        notes.append({
-                            "path": path,
-                            "name": f,
-                            "word_count": words,
-                            "link_count": len(links),
-                        })
+                        notes.append(
+                            {
+                                "path": path,
+                                "name": f,
+                                "word_count": words,
+                                "link_count": len(links),
+                            }
+                        )
                     except OSError:
                         continue
     except OSError:
@@ -488,31 +490,33 @@ def scan_vault(vault_path: str) -> list[dict[str, Any]]:
     try:
         for root, dirs, files in os.walk(vault_path):
             # Skip hidden directories
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
 
             for f in files:
                 # Skip hidden and non-markdown files
-                if f.startswith('.'):
+                if f.startswith("."):
                     continue
-                if not f.endswith('.md'):
+                if not f.endswith(".md"):
                     continue
 
                 path = os.path.join(root, f)
 
                 try:
-                    with open(path, encoding='utf-8') as file:
+                    with open(path, encoding="utf-8") as file:
                         content = file.read()
 
                     links = extract_wikilinks(content)
 
-                    notes.append({
-                        "path": path,
-                        "name": f,
-                        "title": f[:-3],  # Remove .md
-                        "content": content,
-                        "links": links,
-                        "has_moc": f.endswith("-MOC.md"),
-                    })
+                    notes.append(
+                        {
+                            "path": path,
+                            "name": f,
+                            "title": f[:-3],  # Remove .md
+                            "content": content,
+                            "links": links,
+                            "has_moc": f.endswith("-MOC.md"),
+                        }
+                    )
                 except OSError:
                     continue
     except OSError:

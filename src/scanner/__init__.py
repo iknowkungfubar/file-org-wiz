@@ -19,22 +19,39 @@ except ImportError:
 FILE_TYPE_CATEGORIES = {
     # Projects - time-bound deliverables
     "01_PROJECTS": [
-        ".psd", ".ai", ".sketch", ".fig", ".xd",
-        ".proto", ".storyboard", ".xcodeproj",
+        ".psd",
+        ".ai",
+        ".sketch",
+        ".fig",
+        ".xd",
+        ".proto",
+        ".storyboard",
+        ".xcodeproj",
     ],
     # Areas - ongoing responsibilities
     "02_AREAS": [
-        ".budget", ".xlsx", ".csv",
+        ".budget",
+        ".xlsx",
+        ".csv",
     ],
     # Resources - reference material
     "03_RESOURCES": [
-        ".pdf", ".epub", ".mobi",
-        ".md", ".txt", ".notes",
-        ".url", ".bookmarks",
+        ".pdf",
+        ".epub",
+        ".mobi",
+        ".md",
+        ".txt",
+        ".notes",
+        ".url",
+        ".bookmarks",
     ],
     # Archive
     "04_ARCHIVE": [
-        ".zip", ".tar", ".gz", ".7z", ".rar",
+        ".zip",
+        ".tar",
+        ".gz",
+        ".7z",
+        ".rar",
     ],
 }
 
@@ -42,19 +59,39 @@ FILE_TYPE_CATEGORIES = {
 # Patterns that suggest a category
 NAME_PATTERNS = {
     "01_PROJECTS": [
-        r"project", r"proposal", r"draft", r"v\d", r"final",
-        r"client", r"contract",
+        r"project",
+        r"proposal",
+        r"draft",
+        r"v\d",
+        r"final",
+        r"client",
+        r"contract",
     ],
     "02_AREAS": [
-        r"invoice", r"tax", r"budget", r"health", r"fitness",
-        r"finance", r"投资", r"预算",
+        r"invoice",
+        r"tax",
+        r"budget",
+        r"health",
+        r"fitness",
+        r"finance",
+        r"投资",
+        r"预算",
     ],
     "03_RESOURCES": [
-        r"reference", r"note", r"research", r"article",
-        r"tutorial", r"guide", r"documentation",
+        r"reference",
+        r"note",
+        r"research",
+        r"article",
+        r"tutorial",
+        r"guide",
+        r"documentation",
     ],
     "04_ARCHIVE": [
-        r"archive", r"old", r"backup", r"completed", r"done",
+        r"archive",
+        r"old",
+        r"backup",
+        r"completed",
+        r"done",
     ],
 }
 
@@ -67,33 +104,35 @@ def scan_files_recursive(base_path, max_depth=10, include_hidden=False):
         for root, dirs, filenames in os.walk(base_path):
             # Calculate depth
             rel_root = os.path.relpath(root, base_path)
-            depth = rel_root.count(os.sep) if rel_root != '.' else 0
+            depth = rel_root.count(os.sep) if rel_root != "." else 0
 
             if depth >= max_depth:
                 continue
 
             # Filter hidden directories if needed
             if not include_hidden:
-                dirs[:] = [d for d in dirs if not d.startswith('.')]
+                dirs[:] = [d for d in dirs if not d.startswith(".")]
 
             for filename in filenames:
                 # Skip hidden files if needed
-                if not include_hidden and filename.startswith('.'):
+                if not include_hidden and filename.startswith("."):
                     continue
 
                 file_path = os.path.join(root, filename)
 
                 try:
                     stat = os.stat(file_path)
-                    files.append({
-                        "path": file_path,
-                        "name": filename,
-                        "extension": Path(filename).suffix.lstrip('.').lower(),
-                        "size": stat.st_size,
-                        "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                        "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),
-                        "depth": depth + 1,
-                    })
+                    files.append(
+                        {
+                            "path": file_path,
+                            "name": filename,
+                            "extension": Path(filename).suffix.lstrip(".").lower(),
+                            "size": stat.st_size,
+                            "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                            "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),
+                            "depth": depth + 1,
+                        }
+                    )
                 except OSError:
                     continue
 
@@ -105,7 +144,7 @@ def scan_files_recursive(base_path, max_depth=10, include_hidden=False):
 
 def classify_by_extension(extension):
     """Classify file to PARA category by extension."""
-    extension = extension.lower().lstrip('.')
+    extension = extension.lower().lstrip(".")
 
     # Check file type categories with dots (we're comparing stripped extension)
     ext_with_dot = f".{extension}"
@@ -158,28 +197,24 @@ def classify_file(file_info, use_date=True):
         return {
             "category": "04_ARCHIVE",
             "confidence": "medium",
-            "reason": "file is older than 6 months"
+            "reason": "file is older than 6 months",
         }
 
     if name_category:
         return {
             "category": name_category,
             "confidence": "high",
-            "reason": f"filename matches {name_category} pattern"
+            "reason": f"filename matches {name_category} pattern",
         }
 
     if extension_category:
         return {
             "category": extension_category,
             "confidence": "medium",
-            "reason": f"file type suggests {extension_category}"
+            "reason": f"file type suggests {extension_category}",
         }
 
-    return {
-        "category": "03_RESOURCES",
-        "confidence": "low",
-        "reason": "default category"
-    }
+    return {"category": "03_RESOURCES", "confidence": "low", "reason": "default category"}
 
 
 def scan_and_categorize(base_path, max_depth=10, use_date=True):
@@ -264,16 +299,13 @@ EXT_TO_PARA = {
     "indd": "01_PROJECTS",
     "pptx": "01_PROJECTS",
     "key": "01_PROJECTS",
-
     # Documents often Projects
     "doc": "01_PROJECTS",
     "docx": "01_PROJECTS",
-
     # Finance -> Areas
     "xlsx": "02_AREAS",
     "csv": "02_AREAS",
     "numbers": "02_AREAS",
-
     # Resources
     "pdf": "03_RESOURCES",
     "md": "03_RESOURCES",
@@ -281,7 +313,6 @@ EXT_TO_PARA = {
     "url": "03_RESOURCES",
     "epub": "03_RESOURCES",
     "mobi": "03_RESOURCES",
-
     # Archive
     "zip": "04_ARCHIVE",
     "tar": "04_ARCHIVE",
@@ -293,7 +324,7 @@ def suggest_category(file_path):
     """Suggest PARA category based on file analysis."""
     path = Path(file_path)
     name = path.stem.lower()
-    ext = path.suffix.lstrip('.').lower()
+    ext = path.suffix.lstrip(".").lower()
 
     # By extension
     if ext in EXT_TO_PARA:

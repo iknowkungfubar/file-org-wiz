@@ -25,10 +25,7 @@ def find_duplicates_by_size(files):
             size_groups[size].append(f)
 
     # Return only groups with potential duplicates
-    return {
-        size: file_list for size, file_list in size_groups.items()
-        if len(file_list) > 1
-    }
+    return {size: file_list for size, file_list in size_groups.items() if len(file_list) > 1}
 
 
 def quick_hash_file(file_path):
@@ -103,18 +100,19 @@ def find_duplicates_by_hash(file_group):
 
 def find_duplicates_by_name_similarity(file_list, threshold=0.8):
     """Find duplicates by filename similarity."""
+
     def normalize(name):
         """Remove dates, versions for comparison."""
         # Remove YYYY-MM-DD dates
-        name = re.sub(r'\d{4}-\d{2}-\d{2}', '', name)
+        name = re.sub(r"\d{4}-\d{2}-\d{2}", "", name)
         # Remove vNN version
-        name = re.sub(r'v\d+', '', name)
+        name = re.sub(r"v\d+", "", name)
         # Remove case differences
         name = name.lower()
         # Remove extensions
         name = Path(name).stem
         # Remove special chars
-        name = re.sub(r'[^a-z0-9]', '', name)
+        name = re.sub(r"[^a-z0-9]", "", name)
         return name
 
     name_groups = defaultdict(list)
@@ -292,20 +290,11 @@ def merge_duplicates(duplicate_group, keep_strategy="newest", archive_path="", d
 
 
 def merge_all_duplicates(
-    base_path,
-    keep_strategy="newest",
-    archive_path="",
-    by_content=True,
-    by_name=True,
-    dry_run=True
+    base_path, keep_strategy="newest", archive_path="", by_content=True, by_name=True, dry_run=True
 ):
     """Find and merge all duplicates in a directory."""
     # Find duplicates
-    dupes = find_all_duplicates(
-        base_path,
-        by_content=by_content,
-        by_name=by_name
-    )
+    dupes = find_all_duplicates(base_path, by_content=by_content, by_name=by_name)
 
     duplicate_groups = dupes.get("duplicates", [])
 
@@ -321,10 +310,7 @@ def merge_all_duplicates(
 
     for group in duplicate_groups:
         merge_result = merge_duplicates(
-            group,
-            keep_strategy=keep_strategy,
-            archive_path=archive_path,
-            dry_run=dry_run
+            group, keep_strategy=keep_strategy, archive_path=archive_path, dry_run=dry_run
         )
         results["merges"].append(merge_result)
         results["total_saved_bytes"] += merge_result.get("saved_bytes", 0)
@@ -339,7 +325,7 @@ def merge_all_duplicates(
 
 def format_bytes(size):
     """Format bytes to human readable."""
-    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
         if size < 1024:
             return f"{size:.1f} {unit}"
         size /= 1024

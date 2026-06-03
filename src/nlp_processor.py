@@ -121,9 +121,8 @@ def parse_organization_command(command: str) -> dict[str, Any]:
         "filters": filters,
         "destination": _extract_destination(command_lower),
         "dry_run": any(
-                phrase in command_lower
-                for phrase in ["preview", "dry run", "simulate", "test"]
-            ),
+            phrase in command_lower for phrase in ["preview", "dry run", "simulate", "test"]
+        ),
     }
 
 

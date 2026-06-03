@@ -152,3 +152,6 @@ test_mount/
 # Vault data (if accidentally in repo)
 *.obsidian/
 .vault/
+
+# Hermes agent artifacts (AI instruction files, prompts)
+.hermes/

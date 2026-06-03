@@ -88,15 +88,13 @@ PARA_FOLDERS: list[str] = [
     "03_RESOURCES",
     "04_ARCHIVE",
     "90_TEMPLATES",
-    "99_SYSTEM"
+    "99_SYSTEM",
 ]
 
 # Sub-folders by category
 PROJECT_SUBDIRS: list[str] = ["01_Projects", "02_Client-Work", "03_Personal"]
 AREA_SUBDIRS: list[str] = ["Health", "Finance", "Home", "Learning", "Personal"]
-RESOURCE_SUBDIRS: list[str] = [
-    "AI", "Tech", "Career", "Development", "Media", "Reading", "Tools"
-]
+RESOURCE_SUBDIRS: list[str] = ["AI", "Tech", "Career", "Development", "Media", "Reading", "Tools"]
 
 TEMPLATE_STRUCTURES: dict[str, list[str]] = {
     "finance": [
@@ -119,13 +117,20 @@ TEMPLATE_STRUCTURES: dict[str, list[str]] = {
 
 # Sensitive prefixes that should never be accessible
 SENSITIVE_PREFIXES: tuple[str, ...] = (
-    "/etc", "/sys", "/proc", "/dev",
-    "/boot", "/root", "/.ssh", "/.aws",
+    "/etc",
+    "/sys",
+    "/proc",
+    "/dev",
+    "/boot",
+    "/root",
+    "/.ssh",
+    "/.aws",
 )
 
 # =============================================================================
 # Security Functions
 # =============================================================================
+
 
 def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     """
@@ -183,13 +188,14 @@ def sanitize_filename(filename: str) -> str:
     # Remove any path components
     filename = os.path.basename(filename)
     # Only allow safe characters
-    sanitized = re.sub(r'[^a-zA-Z0-9\-_.]', '', filename)
+    sanitized = re.sub(r"[^a-zA-Z0-9\-_.]", "", filename)
     return sanitized or "unnamed"
 
 
 # =============================================================================
 # Core Functions
 # =============================================================================
+
 
 def create_folder_structure(base_path: str) -> dict[str, list[str]]:
     """Create PARA folder structure."""
@@ -271,8 +277,7 @@ def create_backup(source_path: str, backup_path: str) -> dict[str, Any]:
 
             if os.path.isdir(src):
                 try:
-                    shutil.copytree(src, dst, symlinks=True,
-                                   ignore_dangling_symlinks=True)
+                    shutil.copytree(src, dst, symlinks=True, ignore_dangling_symlinks=True)
                     created.append(f"{item}/")
                 except OSError as e:
                     errors.append(f"{item}/: {str(e)}")
@@ -286,11 +291,7 @@ def create_backup(source_path: str, backup_path: str) -> dict[str, Any]:
     except OSError as e:
         errors.append(f"Backup failed: {str(e)}")
 
-    return {
-        "backup_path": dest_path,
-        "files_copied": created,
-        "errors": errors
-    }
+    return {"backup_path": dest_path, "files_copied": created, "errors": errors}
 
 
 def create_template_structure(base_path: str, template: str) -> dict[str, list[str]]:
@@ -342,11 +343,13 @@ def create_analytics_report(base_path: str) -> dict[str, Any]:
             para_files += 1
         for tag in file_info.get("tags", []):
             tag_counts[tag] += 1
-        largest_files.append({
-            "path": file_info.get("path", ""),
-            "size": file_info.get("size", 0),
-            "category": file_info.get("category", ""),
-        })
+        largest_files.append(
+            {
+                "path": file_info.get("path", ""),
+                "size": file_info.get("size", 0),
+                "category": file_info.get("category", ""),
+            }
+        )
 
     largest_files.sort(key=lambda item: item["size"], reverse=True)
 
@@ -394,18 +397,18 @@ def get_directory_structure(path: str, max_depth: int = 3) -> dict[str, Any]:
         for root, dirs, files in os.walk(path):
             # Calculate depth
             rel_root = os.path.relpath(root, path)
-            depth = rel_root.count(os.sep) if rel_root != '.' else 0
+            depth = rel_root.count(os.sep) if rel_root != "." else 0
 
             if depth >= max_depth:
                 dirs.clear()  # Don't descend further
                 continue
 
             level = depth
-            indent = ' ' * 2 * level
+            indent = " " * 2 * level
             folder_name = os.path.basename(root) or path
             structure.append(f"{indent}{folder_name}/")
 
-            subindent = ' ' * 2 * (level + 1)
+            subindent = " " * 2 * (level + 1)
             # Limit files per directory
             for file in sorted(files)[:10]:
                 structure.append(f"{subindent}{file}")
@@ -418,10 +421,7 @@ def get_directory_structure(path: str, max_depth: int = 3) -> dict[str, Any]:
 
 
 def apply_naming_convention(
-    file_path: str,
-    context: str,
-    description: str,
-    version: int = 1
+    file_path: str, context: str, description: str, version: int = 1
 ) -> dict[str, Any]:
     """Apply naming convention to a file."""
     # Validate path
@@ -430,8 +430,8 @@ def apply_naming_convention(
         return {"original": file_path, "error": error, "success": False}
 
     # Sanitize inputs - only allow safe characters
-    context = re.sub(r'[^a-z0-9\-]', '', context.lower().replace(' ', '-'))
-    description = re.sub(r'[^a-z0-9\-]', '', description.lower().replace(' ', '-'))
+    context = re.sub(r"[^a-z0-9\-]", "", context.lower().replace(" ", "-"))
+    description = re.sub(r"[^a-z0-9\-]", "", description.lower().replace(" ", "-"))
 
     # Validate version is a positive integer
     if version < 1:
@@ -446,31 +446,20 @@ def apply_naming_convention(
 
         os.rename(file_path, new_path)
 
-        return {
-            "original": file_path,
-            "renamed": new_path,
-            "success": True
-        }
+        return {"original": file_path, "renamed": new_path, "success": True}
     except OSError as e:
-        return {
-            "original": file_path,
-            "error": str(e),
-            "success": False
-        }
+        return {"original": file_path, "error": str(e), "success": False}
 
 
 # =============================================================================
 # MCP Endpoints
 # =============================================================================
 
+
 @app.route("/health", methods=["GET"])
 def health_check() -> Response:
     """Health check endpoint."""
-    return jsonify({
-        "status": "healthy",
-        "service": "file-org-wiz-mcp",
-        "version": "1.3.0"
-    })
+    return jsonify({"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"})
 
 
 @app.route("/organize", methods=["POST"])
@@ -514,105 +503,117 @@ def organize() -> tuple[Response, int]:
         "mount_path": mount,
         "dry_run": dry_run,
         "phases": [],
-        "suggested_actions": []
+        "suggested_actions": [],
     }
 
     # Phase 1: Backup (optional, skip in dry-run)
     if do_backup and not dry_run:
         backup_result = create_backup(mount, backup)
-        result["phases"].append({
-            "name": "backup",
-            "status": "complete",
-            "backup_path": backup_result["backup_path"],
-            "files_copied": len(backup_result["files_copied"]),
-            "errors": backup_result.get("errors", [])
-        })
+        result["phases"].append(
+            {
+                "name": "backup",
+                "status": "complete",
+                "backup_path": backup_result["backup_path"],
+                "files_copied": len(backup_result["files_copied"]),
+                "errors": backup_result.get("errors", []),
+            }
+        )
 
     # Phase 2: Scan and Categorize (if dry_run, this is the main phase)
     categorize_result = {"files_scanned": 0, "categorized": [], "summary": {}}
     if scan_and_categorize:
         categorize_result = scan_and_categorize(mount, use_date=False)
-        result["phases"].append({
-            "name": "scan_and_categorize",
-            "status": "complete",
-            "files_scanned": categorize_result["total_files"],
-            "summary": categorize_result["summary"]
-        })
+        result["phases"].append(
+            {
+                "name": "scan_and_categorize",
+                "status": "complete",
+                "files_scanned": categorize_result["total_files"],
+                "summary": categorize_result["summary"],
+            }
+        )
 
         # Generate suggested actions for dry-run
         if dry_run:
             for f in categorize_result["files"]:
                 fpath = f.get("path", "")
                 fcategory = f.get("category", "")
-                result["suggested_actions"].append({
-                    "action": "categorize",
-                    "from": fpath,
-                    "to": os.path.join(mount, fcategory),
-                    "reason": f.get("reason", ""),
-                    "confidence": f.get("confidence", ""),
-                    "tags": f.get("tags", []),
-                    "suggested_name": f.get("suggested_name", "")
-                })
+                result["suggested_actions"].append(
+                    {
+                        "action": "categorize",
+                        "from": fpath,
+                        "to": os.path.join(mount, fcategory),
+                        "reason": f.get("reason", ""),
+                        "confidence": f.get("confidence", ""),
+                        "tags": f.get("tags", []),
+                        "suggested_name": f.get("suggested_name", ""),
+                    }
+                )
 
     # Phase 3: Structure (skip in dry-run as it's just folder creation)
     if not dry_run:
         structure_result = create_folder_structure(mount)
-        result["phases"].append({
-            "name": "create_structure",
-            "status": "complete",
-            "folders_created": len(structure_result["created"]),
-            "errors": structure_result.get("errors", [])
-        })
+        result["phases"].append(
+            {
+                "name": "create_structure",
+                "status": "complete",
+                "folders_created": len(structure_result["created"]),
+                "errors": structure_result.get("errors", []),
+            }
+        )
 
         if template:
             template_result = create_template_structure(mount, template)
-            result["phases"].append({
-                "name": "apply_template",
-                "status": "complete" if not template_result.get("errors") else "failed",
-                "template": template,
-                "folders_created": len(template_result["created"]),
-                "errors": template_result.get("errors", []),
-            })
+            result["phases"].append(
+                {
+                    "name": "apply_template",
+                    "status": "complete" if not template_result.get("errors") else "failed",
+                    "template": template,
+                    "folders_created": len(template_result["created"]),
+                    "errors": template_result.get("errors", []),
+                }
+            )
 
     # Phase 3: Vault (optional, skip in dry-run)
     if create_vault and vault and not dry_run:
         valid, error = validate_path(vault)
         if valid:
             vault_result = create_folder_structure(vault)
-            result["phases"].append({
-                "name": "create_vault",
-                "status": "complete",
-                "vault_path": vault,
-                "folders_created": len(vault_result["created"])
-            })
+            result["phases"].append(
+                {
+                    "name": "create_vault",
+                    "status": "complete",
+                    "vault_path": vault,
+                    "folders_created": len(vault_result["created"]),
+                }
+            )
         else:
-            result["phases"].append({
-                "name": "create_vault",
-                "status": "failed",
-                "error": error
-            })
+            result["phases"].append({"name": "create_vault", "status": "failed", "error": error})
 
     # Phase 4: Duplicate Detection (optional)
     if find_all_duplicates and not dry_run:
         dup_result = find_all_duplicates(mount, by_content=True, by_name=True)
-        result["phases"].append({
-            "name": "find_duplicates",
-            "status": "complete",
-            "duplicate_groups": dup_result.get("duplicate_groups", 0),
-            "total_duplicates": dup_result.get("total_duplicates", 0),
-            "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
-            "errors": dup_result.get("errors", [])
-        })
+        result["phases"].append(
+            {
+                "name": "find_duplicates",
+                "status": "complete",
+                "duplicate_groups": dup_result.get("duplicate_groups", 0),
+                "total_duplicates": dup_result.get("total_duplicates", 0),
+                "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
+                "errors": dup_result.get("errors", []),
+            }
+        )
 
         # Generate suggested actions for duplicates (dry_run simulation)
         if dry_run:
             for group in dup_result.get("duplicates", []):
-                result["suggested_actions"].append({
-                    "action": "merge_duplicates",
-                    "from": [f.get("path") for f in group],
-                    "to": group[0].get("path"),  # Keep newest
-                    "reason": "content duplicate - keep newest",
-                })
+                result["suggested_actions"].append(
+                    {
+                        "action": "merge_duplicates",
+                        "from": [f.get("path") for f in group],
+                        "to": group[0].get("path"),  # Keep newest
+                        "reason": "content duplicate - keep newest",
+                    }
+                )
 
     result["status"] = "complete"
     return jsonify(result), 200
@@ -713,12 +714,7 @@ def apply_names_endpoint() -> tuple[Response, int]:
         context = inferred_context or context
         description = inferred_description or description
 
-    result = apply_naming_convention(
-        file_path,
-        context,
-        description,
-        version
-    )
+    result = apply_naming_convention(file_path, context, description, version)
 
     if result.get("success") and generate_content_tags:
         result["tags"] = generate_content_tags(result["renamed"])
@@ -755,17 +751,20 @@ def analyze_file_endpoint() -> tuple[Response, int]:
 
     try:
         from file_intelligence import suggest_smart_filename
+
         suggested_name = suggest_smart_filename(file_path)
     except ImportError:
         suggested_name = Path(file_path).name
 
-    return jsonify({
-        "file_path": file_path,
-        "context": context,
-        "description": description,
-        "tags": tags,
-        "suggested_name": suggested_name,
-    }), 200
+    return jsonify(
+        {
+            "file_path": file_path,
+            "context": context,
+            "description": description,
+            "tags": tags,
+            "suggested_name": suggested_name,
+        }
+    ), 200
 
 
 @app.route("/nlp-command", methods=["POST"])
@@ -823,19 +822,21 @@ def nlp_command_endpoint() -> tuple[Response, int]:
             "parsed_command": parsed,
             "dry_run": dry_run,
             "phases": [],
-            "suggested_actions": []
+            "suggested_actions": [],
         }
 
         # Phase 1: Backup (optional, skip in dry-run)
         if do_backup and not dry_run:
             backup_result = create_backup(mount, backup)
-            result["phases"].append({
-                "name": "backup",
-                "status": "complete",
-                "backup_path": backup_result["backup_path"],
-                "files_copied": len(backup_result["files_copied"]),
-                "errors": backup_result.get("errors", [])
-            })
+            result["phases"].append(
+                {
+                    "name": "backup",
+                    "status": "complete",
+                    "backup_path": backup_result["backup_path"],
+                    "files_copied": len(backup_result["files_copied"]),
+                    "errors": backup_result.get("errors", []),
+                }
+            )
 
         # Phase 2: Scan and Categorize (if dry_run, this is the main phase)
         categorize_result = {"files_scanned": 0, "categorized": [], "summary": {}}
@@ -846,191 +847,192 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                 use_date = True  # We'll use date filtering if specified
 
             categorize_result = scan_and_categorize(mount, use_date=use_date)
-            result["phases"].append({
-                "name": "scan_and_categorize",
-                "status": "complete",
-                "files_scanned": categorize_result["total_files"],
-                "summary": categorize_result["summary"]
-            })
+            result["phases"].append(
+                {
+                    "name": "scan_and_categorize",
+                    "status": "complete",
+                    "files_scanned": categorize_result["total_files"],
+                    "summary": categorize_result["summary"],
+                }
+            )
 
             # Generate suggested actions for dry-run
             if dry_run:
                 for f in categorize_result["files"]:
                     fpath = f.get("path", "")
                     fcategory = f.get("category", "")
-                    result["suggested_actions"].append({
-                        "action": "categorize",
-                        "from": fpath,
-                        "to": os.path.join(mount, fcategory),
-                        "reason": f.get("reason", ""),
-                        "confidence": f.get("confidence", ""),
-                        "tags": f.get("tags", []),
-                        "suggested_name": f.get("suggested_name", "")
-                    })
+                    result["suggested_actions"].append(
+                        {
+                            "action": "categorize",
+                            "from": fpath,
+                            "to": os.path.join(mount, fcategory),
+                            "reason": f.get("reason", ""),
+                            "confidence": f.get("confidence", ""),
+                            "tags": f.get("tags", []),
+                            "suggested_name": f.get("suggested_name", ""),
+                        }
+                    )
 
         # Phase 3: Structure (skip in dry-run as it's just folder creation)
         if not dry_run:
             structure_result = create_folder_structure(mount)
-            result["phases"].append({
-                "name": "create_structure",
-                "status": "complete",
-                "folders_created": len(structure_result["created"]),
-                "errors": structure_result.get("errors", [])
-            })
+            result["phases"].append(
+                {
+                    "name": "create_structure",
+                    "status": "complete",
+                    "folders_created": len(structure_result["created"]),
+                    "errors": structure_result.get("errors", []),
+                }
+            )
 
             if template:
                 template_result = create_template_structure(mount, template)
-                result["phases"].append({
-                    "name": "apply_template",
-                    "status": "complete" if not template_result.get("errors") else "failed",
-                    "template": template,
-                    "folders_created": len(template_result["created"]),
-                    "errors": template_result.get("errors", []),
-                })
+                result["phases"].append(
+                    {
+                        "name": "apply_template",
+                        "status": "complete" if not template_result.get("errors") else "failed",
+                        "template": template,
+                        "folders_created": len(template_result["created"]),
+                        "errors": template_result.get("errors", []),
+                    }
+                )
 
         # Phase 3: Vault (optional, skip in dry-run)
         if create_vault and vault and not dry_run:
             valid, error = validate_path(vault)
             if valid:
                 vault_result = create_folder_structure(vault)
-                result["phases"].append({
-                    "name": "create_vault",
-                    "status": "complete",
-                    "vault_path": vault,
-                    "folders_created": len(vault_result["created"])
-                })
+                result["phases"].append(
+                    {
+                        "name": "create_vault",
+                        "status": "complete",
+                        "vault_path": vault,
+                        "folders_created": len(vault_result["created"]),
+                    }
+                )
             else:
-                result["phases"].append({
-                    "name": "create_vault",
-                    "status": "failed",
-                    "error": error
-                })
+                result["phases"].append(
+                    {"name": "create_vault", "status": "failed", "error": error}
+                )
 
         # Phase 4: Duplicate Detection (optional)
         if find_all_duplicates and not dry_run:
             dup_result = find_all_duplicates(mount, by_content=True, by_name=True)
-            result["phases"].append({
-                "name": "find_duplicates",
-                "status": "complete",
-                "duplicate_groups": dup_result.get("duplicate_groups", 0),
-                "total_duplicates": dup_result.get("total_duplicates", 0),
-                "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
-                "errors": dup_result.get("errors", [])
-            })
+            result["phases"].append(
+                {
+                    "name": "find_duplicates",
+                    "status": "complete",
+                    "duplicate_groups": dup_result.get("duplicate_groups", 0),
+                    "total_duplicates": dup_result.get("total_duplicates", 0),
+                    "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
+                    "errors": dup_result.get("errors", []),
+                }
+            )
 
             # Generate suggested actions for duplicates (dry_run simulation)
             if dry_run:
                 for group in dup_result.get("duplicates", []):
-                    result["suggested_actions"].append({
-                        "action": "merge_duplicates",
-                        "from": [f.get("path") for f in group],
-                        "to": group[0].get("path"),  # Keep newest
-                        "reason": "content duplicate - keep newest",
-                    })
+                    result["suggested_actions"].append(
+                        {
+                            "action": "merge_duplicates",
+                            "from": [f.get("path") for f in group],
+                            "to": group[0].get("path"),  # Keep newest
+                            "reason": "content duplicate - keep newest",
+                        }
+                    )
 
         result["status"] = "complete"
         return jsonify(result), 200
 
     # For other actions or if we can't execute directly, return the parsed command
-    return jsonify({
-        "status": "parsed",
-        "original_command": command,
-        "parsed_command": parsed,
-        "suggested_mcp_payload": payload,
-        "message": "Command parsed successfully. Use the organize endpoint to execute."
-    }), 200
+    return jsonify(
+        {
+            "status": "parsed",
+            "original_command": command,
+            "parsed_command": parsed,
+            "suggested_mcp_payload": payload,
+            "message": "Command parsed successfully. Use the organize endpoint to execute.",
+        }
+    ), 200
 
 
 @app.route("/mcp-manifest", methods=["GET"])
 def mcp_manifest() -> Response:
     """MCP manifest - tools available."""
-    return jsonify({
-        "name": "file-org-wiz",
-        "version": "1.3.0",
-        "tools": [
-            {
-                "name": "organize",
-                "description": "Execute full file reorganization with PARA structure",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "mount_path": {"type": "string"},
-                        "backup_path": {"type": "string"},
-                        "create_vault": {"type": "boolean"},
-                        "vault_path": {"type": "string"},
-                        "do_backup": {"type": "boolean"},
-                        "template": {"type": "string"}
-                    }
-                }
-            },
-            {
-                "name": "backup",
-                "description": "Create timestamped backup of directory",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "source_path": {"type": "string"},
-                        "backup_path": {"type": "string"}
-                    }
-                }
-            },
-            {
-                "name": "structure",
-                "description": "Get current directory structure",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "path": {"type": "string"},
-                        "max_depth": {"type": "integer"}
-                    }
-                }
-            },
-            {
-                "name": "analytics",
-                "description": "Get file organization analytics and dashboard metrics",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "path": {"type": "string"}
-                    }
-                }
-            },
-            {
-                "name": "apply_names",
-                "description": "Apply naming convention to file",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {"type": "string"},
-                        "context": {"type": "string"},
-                        "description": {"type": "string"},
-                        "version": {"type": "integer"},
-                        "auto_describe": {"type": "boolean"}
-                    }
-                }
-            },
-            {
-                "name": "analyze_file",
-                "description": "Generate tags and a smart filename suggestion for a file",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "file_path": {"type": "string"}
-                    }
-                }
-            },
-            {
-                "name": "nlp_command",
-                "description": "Process natural language file organization commands",
-                "input": {
-                    "type": "object",
-                    "properties": {
-                        "command": {"type": "string"}
-                    }
-                }
-            }
-        ]
-    })
+    return jsonify(
+        {
+            "name": "file-org-wiz",
+            "version": "1.3.0",
+            "tools": [
+                {
+                    "name": "organize",
+                    "description": "Execute full file reorganization with PARA structure",
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "mount_path": {"type": "string"},
+                            "backup_path": {"type": "string"},
+                            "create_vault": {"type": "boolean"},
+                            "vault_path": {"type": "string"},
+                            "do_backup": {"type": "boolean"},
+                            "template": {"type": "string"},
+                        },
+                    },
+                },
+                {
+                    "name": "backup",
+                    "description": "Create timestamped backup of directory",
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "source_path": {"type": "string"},
+                            "backup_path": {"type": "string"},
+                        },
+                    },
+                },
+                {
+                    "name": "structure",
+                    "description": "Get current directory structure",
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string"},
+                            "max_depth": {"type": "integer"},
+                        },
+                    },
+                },
+                {
+                    "name": "analytics",
+                    "description": "Get file organization analytics and dashboard metrics",
+                    "input": {"type": "object", "properties": {"path": {"type": "string"}}},
+                },
+                {
+                    "name": "apply_names",
+                    "description": "Apply naming convention to file",
+                    "input": {
+                        "type": "object",
+                        "properties": {
+                            "file_path": {"type": "string"},
+                            "context": {"type": "string"},
+                            "description": {"type": "string"},
+                            "version": {"type": "integer"},
+                            "auto_describe": {"type": "boolean"},
+                        },
+                    },
+                },
+                {
+                    "name": "analyze_file",
+                    "description": "Generate tags and a smart filename suggestion for a file",
+                    "input": {"type": "object", "properties": {"file_path": {"type": "string"}}},
+                },
+                {
+                    "name": "nlp_command",
+                    "description": "Process natural language file organization commands",
+                    "input": {"type": "object", "properties": {"command": {"type": "string"}}},
+                },
+            ],
+        }
+    )
 
 
 # =============================================================================
@@ -1054,31 +1056,20 @@ For Production:
   - Add authentication at the proxy level
   - Enable rate limiting at the proxy level
   - Use HTTPS in production
-        """
+        """,
     )
+    parser.add_argument("--port", type=int, default=5000, help="Port to run server (default: 5000)")
     parser.add_argument(
-        "--port", type=int, default=5000,
-        help="Port to run server (default: 5000)"
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Host to bind (default: 127.0.0.1 for security)",
     )
+    parser.add_argument("--mount", type=str, default=MOUNT_PATH, help="Default mount path")
+    parser.add_argument("--backup", type=str, default=BACKUP_PATH, help="Default backup path")
+    parser.add_argument("--vault", type=str, default=VAULT_PATH, help="Default vault path")
     parser.add_argument(
-        "--host", type=str, default="127.0.0.1",
-        help="Host to bind (default: 127.0.0.1 for security)"
-    )
-    parser.add_argument(
-        "--mount", type=str, default=MOUNT_PATH,
-        help="Default mount path"
-    )
-    parser.add_argument(
-        "--backup", type=str, default=BACKUP_PATH,
-        help="Default backup path"
-    )
-    parser.add_argument(
-        "--vault", type=str, default=VAULT_PATH,
-        help="Default vault path"
-    )
-    parser.add_argument(
-        "--cors", action="store_true",
-        help="Enable CORS (use with caution - security risk)"
+        "--cors", action="store_true", help="Enable CORS (use with caution - security risk)"
     )
 
     args = parser.parse_args()
@@ -1110,8 +1101,4 @@ For Production:
     print()
 
     # Security: Disable debug mode in production
-    app.run(
-        host=args.host,
-        port=args.port,
-        debug=False
-    )
+    app.run(host=args.host, port=args.port, debug=False)
