@@ -1,19 +1,18 @@
 """Tests for core functions."""
 
 import os
-import pytest
 import sys
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from mcp_server import (
-    create_folder_structure,
-    create_backup,
-    get_directory_structure,
     apply_naming_convention,
-    create_template_structure,
     create_analytics_report,
+    create_backup,
+    create_folder_structure,
+    create_template_structure,
+    get_directory_structure,
 )
 
 
@@ -25,8 +24,15 @@ class TestCreateFolderStructure:
         result = create_folder_structure(mount_dir)
 
         assert len(result["errors"]) == 0
-        for folder in ["00_INBOX", "01_PROJECTS", "02_AREAS", "03_RESOURCES",
-                       "04_ARCHIVE", "90_TEMPLATES", "99_SYSTEM"]:
+        for folder in [
+            "00_INBOX",
+            "01_PROJECTS",
+            "02_AREAS",
+            "03_RESOURCES",
+            "04_ARCHIVE",
+            "90_TEMPLATES",
+            "99_SYSTEM",
+        ]:
             assert os.path.exists(os.path.join(mount_dir, folder))
 
     def test_creates_subfolders(self, mount_dir):
@@ -121,24 +127,14 @@ class TestApplyNamingConvention:
         with open(test_file, "w") as f:
             f.write("test content")
 
-        result = apply_naming_convention(
-            test_file,
-            "project",
-            "test-document",
-            1
-        )
+        result = apply_naming_convention(test_file, "project", "test-document", 1)
 
         assert result["success"] is True
         assert os.path.exists(result["renamed"])
 
     def test_invalid_path_returns_error(self):
         """Invalid path should return error."""
-        result = apply_naming_convention(
-            "/nonexistent/file.txt",
-            "project",
-            "test",
-            1
-        )
+        result = apply_naming_convention("/nonexistent/file.txt", "project", "test", 1)
         assert result["success"] is False
         assert "error" in result
 
@@ -148,12 +144,7 @@ class TestApplyNamingConvention:
         with open(test_file, "w") as f:
             f.write("content")
 
-        result = apply_naming_convention(
-            test_file,
-            "Project Name With Spaces!",
-            "Test Doc",
-            1
-        )
+        result = apply_naming_convention(test_file, "Project Name With Spaces!", "Test Doc", 1)
 
         assert result["success"] is True
         # Context should be lowercase with no spaces

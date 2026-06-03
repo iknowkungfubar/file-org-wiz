@@ -1,9 +1,10 @@
 """Tests for API endpoints."""
 
-import os
 import json
-import pytest
+import os
 import sys
+
+import pytest
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -45,11 +46,10 @@ class TestOrganizeEndpoint:
 
     def test_organize_without_backup(self, client, mount_dir, backup_dir):
         """Organize without backup should succeed."""
-        response = client.post("/organize", json={
-            "mount_path": mount_dir,
-            "backup_path": backup_dir,
-            "do_backup": False
-        })
+        response = client.post(
+            "/organize",
+            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": False},
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -57,31 +57,28 @@ class TestOrganizeEndpoint:
 
     def test_organize_creates_folders(self, client, mount_dir, backup_dir):
         """Organize should create PARA folder structure."""
-        client.post("/organize", json={
-            "mount_path": mount_dir,
-            "backup_path": backup_dir,
-            "do_backup": False
-        })
+        client.post(
+            "/organize",
+            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": False},
+        )
 
         for folder in ["00_INBOX", "01_PROJECTS", "02_AREAS"]:
             assert os.path.exists(os.path.join(mount_dir, folder))
 
     def test_organize_with_invalid_path(self, client):
         """Organize with invalid path should return 400."""
-        response = client.post("/organize", json={
-            "mount_path": "/etc/passwd",
-            "backup_path": "/tmp"
-        })
+        response = client.post(
+            "/organize", json={"mount_path": "/etc/passwd", "backup_path": "/tmp"}
+        )
 
         assert response.status_code == 400
 
     def test_organize_with_backup(self, client, mount_dir, backup_dir):
         """Organize with backup should create backup."""
-        response = client.post("/organize", json={
-            "mount_path": mount_dir,
-            "backup_path": backup_dir,
-            "do_backup": True
-        })
+        response = client.post(
+            "/organize",
+            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": True},
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -90,12 +87,15 @@ class TestOrganizeEndpoint:
         assert backup_phase is not None
 
     def test_organize_applies_template(self, client, mount_dir, backup_dir):
-        response = client.post("/organize", json={
-            "mount_path": mount_dir,
-            "backup_path": backup_dir,
-            "do_backup": False,
-            "template": "finance",
-        })
+        response = client.post(
+            "/organize",
+            json={
+                "mount_path": mount_dir,
+                "backup_path": backup_dir,
+                "do_backup": False,
+                "template": "finance",
+            },
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -110,10 +110,9 @@ class TestBackupEndpoint:
 
     def test_backup_creates_timestamped_folder(self, client, mount_dir, backup_dir):
         """Backup should create timestamped folder."""
-        response = client.post("/backup", json={
-            "source_path": mount_dir,
-            "backup_path": backup_dir
-        })
+        response = client.post(
+            "/backup", json={"source_path": mount_dir, "backup_path": backup_dir}
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -122,10 +121,9 @@ class TestBackupEndpoint:
 
     def test_backup_with_invalid_source(self, client, backup_dir):
         """Backup with invalid source should return error in response."""
-        response = client.post("/backup", json={
-            "source_path": "/nonexistent",
-            "backup_path": backup_dir
-        })
+        response = client.post(
+            "/backup", json={"source_path": "/nonexistent", "backup_path": backup_dir}
+        )
         data = json.loads(response.data)
 
         # Should return success but include error info
@@ -147,7 +145,7 @@ class TestStructureEndpoint:
     def test_structure_with_depth(self, client, mount_dir):
         """Structure endpoint should respect max_depth."""
         response = client.get(f"/structure?path={mount_dir}&max_depth=2")
-        data = json.loads(response.data)
+        json.loads(response.data)
 
         assert response.status_code == 200
 
@@ -199,11 +197,10 @@ class TestApplyNamesEndpoint:
 
     def test_apply_names_with_nonexistent_file(self, client):
         """Apply names with nonexistent file should return error."""
-        response = client.post("/apply-names", json={
-            "file_path": "/nonexistent/file.txt",
-            "context": "test",
-            "description": "test"
-        })
+        response = client.post(
+            "/apply-names",
+            json={"file_path": "/nonexistent/file.txt", "context": "test", "description": "test"},
+        )
 
         assert response.status_code == 400
 
@@ -214,12 +211,15 @@ class TestApplyNamesEndpoint:
         with open(test_file, "w") as f:
             f.write("test content")
 
-        response = client.post("/apply-names", json={
-            "file_path": test_file,
-            "context": "project",
-            "description": "test-doc",
-            "version": 1
-        })
+        response = client.post(
+            "/apply-names",
+            json={
+                "file_path": test_file,
+                "context": "project",
+                "description": "test-doc",
+                "version": 1,
+            },
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -258,9 +258,9 @@ class TestNlpCommandEndpoint:
         assert "error" in data
 
     def test_nlp_command_parses_find_request(self, client):
-        response = client.post("/nlp-command", json={
-            "command": "find all PDF files from last month"
-        })
+        response = client.post(
+            "/nlp-command", json={"command": "find all PDF files from last month"}
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
@@ -273,12 +273,16 @@ class TestNlpCommandEndpoint:
         with open(test_file, "w", encoding="utf-8") as handle:
             handle.write("Invoice for April website project. Client tax summary enclosed.")
 
-        response = client.post("/apply-names", json={
-            "file_path": test_file,
-            "auto_describe": True,
-        })
+        response = client.post(
+            "/apply-names",
+            json={
+                "file_path": test_file,
+                "auto_describe": True,
+            },
+        )
         data = json.loads(response.data)
 
         assert response.status_code == 200
         assert data["success"] is True
-        assert "invoice" in os.path.basename(data["renamed"]).lower() or "finance" in os.path.basename(data["renamed"]).lower()
+        result = os.path.basename(data["renamed"]).lower()
+        assert "invoice" in result or "finance" in result

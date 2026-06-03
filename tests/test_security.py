@@ -1,13 +1,12 @@
 """Tests for security functions."""
 
 import os
-import pytest
 import sys
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_server import validate_path, safe_join_path, sanitize_filename
+from mcp_server import safe_join_path, sanitize_filename, validate_path
 
 
 class TestValidatePath:
@@ -40,19 +39,19 @@ class TestValidatePath:
         """/etc/passwd access should be rejected."""
         valid, error = validate_path("/etc/passwd")
         assert valid is False
-        assert "not allowed" in error.lower()
+        assert "restricted" in error.lower()
 
     def test_ssh_path_rejected(self):
         """SSH directory access should be rejected."""
         valid, error = validate_path("/.ssh")
         assert valid is False
-        assert "not allowed" in error.lower()
+        assert "restricted" in error.lower()
 
     def test_proc_rejected(self):
         """/proc access should be rejected."""
         valid, error = validate_path("/proc")
         assert valid is False
-        assert "not allowed" in error.lower() or "restricted" in error.lower()
+        assert "restricted" in error.lower()
 
 
 class TestSafeJoinPath:

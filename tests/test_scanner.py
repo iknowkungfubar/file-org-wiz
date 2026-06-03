@@ -2,16 +2,15 @@
 
 import os
 import sys
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from scanner import (
-    scan_files_recursive,
     classify_by_extension,
     classify_by_name,
-    suggest_category,
     scan_and_categorize,
+    scan_files_recursive,
+    suggest_category,
 )
 
 
@@ -38,7 +37,7 @@ class TestScanFilesRecursive:
         # Create nested structure
         subdir = os.path.join(mount_dir, "subdir")
         os.makedirs(subdir)
-        
+
         with open(os.path.join(mount_dir, "file1.txt"), "w") as f:
             f.write("content")
         with open(os.path.join(subdir, "file2.txt"), "w") as f:
@@ -53,7 +52,7 @@ class TestScanFilesRecursive:
         d1 = os.path.join(mount_dir, "d1")
         d2 = os.path.join(d1, "d2")
         os.makedirs(d2)
-        
+
         with open(os.path.join(d2, "deep.txt"), "w") as f:
             f.write("deep")
 

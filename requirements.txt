@@ -1,7 +1,6 @@
-# file-org-wiz dependencies
+# file-org-wiz core dependencies
+# For development, install with: pip install -e ".[dev]"
 Flask>=2.3.2
 Werkzeug>=2.3.0
 flask-cors>=4.0.0
-pytest>=7.0.0
-pytest-cov>=4.0.0
 pyyaml>=6.0
