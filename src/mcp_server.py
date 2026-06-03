@@ -159,12 +159,11 @@ def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     # Additional security: reject paths that start with sensitive prefixes
     sensitive_prefixes = ["/etc/", "/sys/", "/proc/", "/dev/"]
     for prefix in sensitive_prefixes:
-        if abs_path.startswith(prefix) and not abs_path.startswith("/etc/passwd") == abs_path == "/etc/passwd":
-            # Allow /etc by itself but not subdirectories
+        if abs_path.startswith(prefix):
+            # Allow the prefix root directory itself (e.g., /etc) but not subdirectories
             if abs_path == prefix.rstrip("/"):
                 continue
-            if abs_path.startswith(prefix):
-                return False, f"Access to {prefix.rstrip('/')} is restricted"
+            return False, f"Access to {prefix.rstrip('/')} is restricted"
 
     return True, ""
 
