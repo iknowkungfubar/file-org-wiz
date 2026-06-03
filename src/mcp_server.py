@@ -143,8 +143,12 @@ def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     except (ValueError, OSError) as e:
         return False, f"Invalid path: {str(e)}"
 
-    # Check for path traversal attempts in original input
-    if ".." in path:
+    # Normalize path first with os.path.normpath to resolve encoded/Unicode
+    # traversal bypass attempts (e.g. U+2025 TWO DOT LEADER) before checking.
+    # os.path.normpath resolves '..' segments where possible, so the check
+    # below catches the remaining unresolved ones (e.g. leading '../etc').
+    clean_path = os.path.normpath(path)
+    if ".." in clean_path:
         return False, "Path traversal not allowed"
 
     # Check for dangerous paths
