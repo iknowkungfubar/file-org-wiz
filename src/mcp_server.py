@@ -117,12 +117,11 @@ TEMPLATE_STRUCTURES: dict[str, list[str]] = {
     ],
 }
 
-# Dangerous paths that should never be accessible
-DANGEROUS_PATHS: set[str] = {
-    "/etc/passwd", "/etc/shadow", "/etc/ssh", "/.ssh", "/.aws",
-    "/etc/gshadow", "/etc/group", "/etc/shadow", "/etc/security",
-    "/proc", "/sys"
-}
+# Sensitive prefixes that should never be accessible
+SENSITIVE_PREFIXES: tuple[str, ...] = (
+    "/etc/", "/sys/", "/proc/", "/dev/",
+    "/boot/", "/root/", "/.ssh/", "/.aws/",
+)
 
 # =============================================================================
 # Security Functions
@@ -130,8 +129,9 @@ DANGEROUS_PATHS: set[str] = {
 
 def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     """
-    Validate path to prevent path traversal and access to dangerous paths.
+    Validate path to prevent path traversal and access to sensitive paths.
 
+    Blocks all sensitive system prefixes uniformly — no special-casing.
     Returns: (is_valid, error_message)
     """
     if not path:
@@ -143,26 +143,14 @@ def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     except (ValueError, OSError) as e:
         return False, f"Invalid path: {str(e)}"
 
-    # Normalize path first with os.path.normpath to resolve encoded/Unicode
-    # traversal bypass attempts (e.g. U+2025 TWO DOT LEADER) before checking.
-    # os.path.normpath resolves '..' segments where possible, so the check
-    # below catches the remaining unresolved ones (e.g. leading '../etc').
+    # Normalize to resolve encoded/Unicode traversal bypass attempts
     clean_path = os.path.normpath(path)
     if ".." in clean_path:
         return False, "Path traversal not allowed"
 
-    # Check for dangerous paths
-    for dangerous in DANGEROUS_PATHS:
-        if abs_path.startswith(dangerous):
-            return False, f"Access to {dangerous} is not allowed"
-
-    # Additional security: reject paths that start with sensitive prefixes
-    sensitive_prefixes = ["/etc/", "/sys/", "/proc/", "/dev/"]
-    for prefix in sensitive_prefixes:
+    # Block any path starting with a sensitive prefix (no exceptions)
+    for prefix in SENSITIVE_PREFIXES:
         if abs_path.startswith(prefix):
-            # Allow the prefix root directory itself (e.g., /etc) but not subdirectories
-            if abs_path == prefix.rstrip("/"):
-                continue
             return False, f"Access to {prefix.rstrip('/')} is restricted"
 
     return True, ""
