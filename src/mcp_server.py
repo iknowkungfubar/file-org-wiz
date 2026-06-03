@@ -24,12 +24,12 @@ from __future__ import annotations
 import os
 import re
 import shutil
-import json
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Any
-from flask import Flask, request, jsonify, Response
+from typing import Any
+
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 
 # Import scanner and duplicates modules
@@ -47,13 +47,13 @@ except ImportError:
 
 # Import NLP processor
 try:
-    from nlp_processor import parse_organization_command, generate_mcp_payload
+    from nlp_processor import generate_mcp_payload, parse_organization_command
 except ImportError:
     parse_organization_command = None
     generate_mcp_payload = None
 
 try:
-    from file_intelligence import infer_context_description, generate_content_tags
+    from file_intelligence import generate_content_tags, infer_context_description
 except ImportError:
     infer_context_description = None
     generate_content_tags = None
@@ -156,7 +156,7 @@ def validate_path(path: str, allow_absolute: bool = True) -> tuple[bool, str]:
     return True, ""
 
 
-def safe_join_path(base: str, *paths: str) -> Optional[str]:
+def safe_join_path(base: str, *paths: str) -> str | None:
     """
     Safely join paths and ensure result is within base directory.
 
@@ -538,7 +538,7 @@ def organize() -> tuple[Response, int]:
             "files_scanned": categorize_result["total_files"],
             "summary": categorize_result["summary"]
         })
-        
+
         # Generate suggested actions for dry-run
         if dry_run:
             for f in categorize_result["files"]:
@@ -553,7 +553,7 @@ def organize() -> tuple[Response, int]:
                     "tags": f.get("tags", []),
                     "suggested_name": f.get("suggested_name", "")
                 })
-    
+
     # Phase 3: Structure (skip in dry-run as it's just folder creation)
     if not dry_run:
         structure_result = create_folder_structure(mount)
@@ -603,7 +603,7 @@ def organize() -> tuple[Response, int]:
             "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
             "errors": dup_result.get("errors", [])
         })
-        
+
         # Generate suggested actions for duplicates (dry_run simulation)
         if dry_run:
             for group in dup_result.get("duplicates", []):
@@ -674,7 +674,7 @@ def analytics_endpoint() -> tuple[Response, int]:
 def apply_names_endpoint() -> tuple[Response, int]:
     """
     Apply naming convention.
-    
+
     POST body:
     {
         "file_path": "/path/to/file",
@@ -772,7 +772,7 @@ def analyze_file_endpoint() -> tuple[Response, int]:
 def nlp_command_endpoint() -> tuple[Response, int]:
     """
     Process natural language file organization commands.
-    
+
     POST body:
     {
         "command": "organize my downloads folder"
@@ -780,24 +780,24 @@ def nlp_command_endpoint() -> tuple[Response, int]:
     """
     if not parse_organization_command:
         return jsonify({"error": "NLP processing not available"}), 503
-    
+
     data = request.json or {}
     command = data.get("command", "")
-    
+
     if not command:
         return jsonify({"error": "command is required"}), 400
-    
+
     # Parse the natural language command
     parsed = parse_organization_command(command)
-    
+
     # Generate MCP payload
     payload = generate_mcp_payload(parsed)
-    
+
     # If this is an organize command, we can execute it directly
     if parsed.get("action") == "organize" and payload.get("mount_path"):
         # Execute the organize function with our parsed parameters
         # We'll reuse the organize endpoint logic but with our parsed data
-        
+
         # Get paths from parsed payload
         mount = payload.get("mount_path", MOUNT_PATH)
         backup = data.get("backup_path", BACKUP_PATH)  # Still allow override
@@ -806,16 +806,16 @@ def nlp_command_endpoint() -> tuple[Response, int]:
         do_backup = bool(data.get("do_backup", True))
         dry_run = payload.get("dry_run", False)
         template = data.get("template")
-        
+
         # Validate paths
         valid, error = validate_path(mount)
         if not valid:
             return jsonify({"error": f"Invalid mount_path: {error}"}), 400
-        
+
         valid, error = validate_path(backup)
         if not valid:
             return jsonify({"error": f"Invalid backup_path: {error}"}), 400
-        
+
         result: dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "mount_path": mount,
@@ -825,7 +825,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
             "phases": [],
             "suggested_actions": []
         }
-        
+
         # Phase 1: Backup (optional, skip in dry-run)
         if do_backup and not dry_run:
             backup_result = create_backup(mount, backup)
@@ -836,7 +836,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                 "files_copied": len(backup_result["files_copied"]),
                 "errors": backup_result.get("errors", [])
             })
-        
+
         # Phase 2: Scan and Categorize (if dry_run, this is the main phase)
         categorize_result = {"files_scanned": 0, "categorized": [], "summary": {}}
         if scan_and_categorize:
@@ -844,7 +844,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
             use_date = True  # Default
             if parsed.get("filters", {}).get("date_range"):
                 use_date = True  # We'll use date filtering if specified
-            
+
             categorize_result = scan_and_categorize(mount, use_date=use_date)
             result["phases"].append({
                 "name": "scan_and_categorize",
@@ -852,7 +852,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                 "files_scanned": categorize_result["total_files"],
                 "summary": categorize_result["summary"]
             })
-            
+
             # Generate suggested actions for dry-run
             if dry_run:
                 for f in categorize_result["files"]:
@@ -867,7 +867,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                         "tags": f.get("tags", []),
                         "suggested_name": f.get("suggested_name", "")
                     })
-        
+
         # Phase 3: Structure (skip in dry-run as it's just folder creation)
         if not dry_run:
             structure_result = create_folder_structure(mount)
@@ -887,7 +887,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                     "folders_created": len(template_result["created"]),
                     "errors": template_result.get("errors", []),
                 })
-        
+
         # Phase 3: Vault (optional, skip in dry-run)
         if create_vault and vault and not dry_run:
             valid, error = validate_path(vault)
@@ -905,7 +905,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                     "status": "failed",
                     "error": error
                 })
-        
+
         # Phase 4: Duplicate Detection (optional)
         if find_all_duplicates and not dry_run:
             dup_result = find_all_duplicates(mount, by_content=True, by_name=True)
@@ -917,7 +917,7 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                 "total_wasted_bytes": dup_result.get("total_wasted_bytes", 0),
                 "errors": dup_result.get("errors", [])
             })
-            
+
             # Generate suggested actions for duplicates (dry_run simulation)
             if dry_run:
                 for group in dup_result.get("duplicates", []):
@@ -927,10 +927,10 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                         "to": group[0].get("path"),  # Keep newest
                         "reason": "content duplicate - keep newest",
                     })
-        
+
         result["status"] = "complete"
         return jsonify(result), 200
-    
+
     # For other actions or if we can't execute directly, return the parsed command
     return jsonify({
         "status": "parsed",

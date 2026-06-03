@@ -1,9 +1,10 @@
 """Tests for API endpoints."""
 
-import os
 import json
-import pytest
+import os
 import sys
+
+import pytest
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -147,7 +148,7 @@ class TestStructureEndpoint:
     def test_structure_with_depth(self, client, mount_dir):
         """Structure endpoint should respect max_depth."""
         response = client.get(f"/structure?path={mount_dir}&max_depth=2")
-        data = json.loads(response.data)
+        json.loads(response.data)
 
         assert response.status_code == 200
 
@@ -281,4 +282,5 @@ class TestNlpCommandEndpoint:
 
         assert response.status_code == 200
         assert data["success"] is True
-        assert "invoice" in os.path.basename(data["renamed"]).lower() or "finance" in os.path.basename(data["renamed"]).lower()
+        result = os.path.basename(data["renamed"]).lower()
+        assert "invoice" in result or "finance" in result

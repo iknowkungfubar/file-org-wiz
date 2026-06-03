@@ -7,7 +7,6 @@ import re
 from datetime import datetime, timedelta
 from typing import Any
 
-
 FOLDER_PATHS = {
     "downloads": "Downloads",
     "desktop": "Desktop",
@@ -76,7 +75,13 @@ def _extract_date_filters(command: str) -> dict[str, Any]:
         }
     if "this week" in command:
         start = now - timedelta(days=now.weekday())
-        return {"date_range": {"start": start.strftime("%Y-%m-%d"), "end": now.strftime("%Y-%m-%d")}}
+        date_str = now.strftime("%Y-%m-%d")
+        return {
+            "date_range": {
+                "start": start.strftime("%Y-%m-%d"),
+                "end": date_str,
+            }
+        }
     if "yesterday" in command:
         return {"date": (now - timedelta(days=1)).strftime("%Y-%m-%d")}
     if "today" in command:
@@ -115,7 +120,10 @@ def parse_organization_command(command: str) -> dict[str, Any]:
         "target_path": _extract_target_path(command_lower),
         "filters": filters,
         "destination": _extract_destination(command_lower),
-        "dry_run": any(phrase in command_lower for phrase in ["preview", "dry run", "simulate", "test"]),
+        "dry_run": any(
+                phrase in command_lower
+                for phrase in ["preview", "dry run", "simulate", "test"]
+            ),
     }
 
 

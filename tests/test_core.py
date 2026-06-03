@@ -1,19 +1,18 @@
 """Tests for core functions."""
 
 import os
-import pytest
 import sys
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from mcp_server import (
-    create_folder_structure,
-    create_backup,
-    get_directory_structure,
     apply_naming_convention,
-    create_template_structure,
     create_analytics_report,
+    create_backup,
+    create_folder_structure,
+    create_template_structure,
+    get_directory_structure,
 )
 
 

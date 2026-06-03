@@ -2,18 +2,17 @@
 
 import os
 import sys
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from duplicates import (
     find_duplicates_by_size,
-    quick_hash_file,
+    format_bytes,
     full_hash_file,
     get_newest_file,
     get_oldest_file,
     merge_duplicates,
-    format_bytes,
+    quick_hash_file,
 )
 
 
@@ -47,15 +46,15 @@ class TestQuickHashFile:
         """Same content should produce same hash."""
         f1 = os.path.join(mount_dir, "f1.txt")
         f2 = os.path.join(mount_dir, "f2.txt")
-        
+
         with open(f1, "w") as f:
             f.write("test content here")
         with open(f2, "w") as f:
             f.write("test content here")
-        
+
         h1 = quick_hash_file(f1)
         h2 = quick_hash_file(f2)
-        
+
         assert h1 == h2
         assert len(h1) > 0
 
@@ -67,15 +66,15 @@ class TestFullHashFile:
         """Different content should produce different hash."""
         f1 = os.path.join(mount_dir, "f1.txt")
         f2 = os.path.join(mount_dir, "f2.txt")
-        
+
         with open(f1, "w") as f:
             f.write("content A")
         with open(f2, "w") as f:
             f.write("content B")
-        
+
         h1 = full_hash_file(f1)
         h2 = full_hash_file(f2)
-        
+
         assert h1 != h2
 
 
@@ -115,7 +114,7 @@ class TestMergeDuplicates:
             {"path": "/dup1.txt", "size": 100},
         ]
         result = merge_duplicates(files, keep_strategy="newest", dry_run=True)
-        
+
         assert result["kept"] == "/keep.txt" or result["kept"] == "/dup1.txt"
         assert result["deleted"] == ["/dup1.txt"]  # Preview deletion
         assert result["saved_bytes"] == 0  # No actual savings in dry run
@@ -124,7 +123,7 @@ class TestMergeDuplicates:
         """Single file should not trigger merge."""
         files = [{"path": "/only.txt", "size": 100}]
         result = merge_duplicates(files)
-        
+
         # Single file - should not attempt merge
         assert len(result["archived"]) == 0
         assert len(result["deleted"]) == 0

@@ -2,17 +2,15 @@
 
 import os
 import sys
-import re
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from zettelkasten import (
-    extract_wikilinks,
-    generate_moc_content,
-    create_moc_file,
-    find_similar_notes,
     analyze_links,
+    create_moc_file,
+    extract_wikilinks,
+    find_similar_notes,
+    generate_moc_content,
     split_atomic_notes,
 )
 
@@ -46,7 +44,7 @@ class TestGenerateMOCContent:
         """Should generate basic MOC content."""
         notes = ["note1.md", "note2.md", "note3.md"]
         content = generate_moc_content("My Topic", notes)
-        
+
         assert "# My Topic" in content
         assert "note1" in content  # stems are extracted
 
@@ -54,7 +52,7 @@ class TestGenerateMOCContent:
         """Should add wikilinks to notes."""
         notes = ["note1.md", "note2.md"]
         content = generate_moc_content("Test Topic", notes)
-        
+
         # Should contain link format
         assert "note1" in content
 
@@ -66,9 +64,9 @@ class TestCreateMOCFile:
         """Should create MOC file."""
         notes = ["note1.md", "note2.md"]
         path = create_moc_file(mount_dir, "TestTopic", notes)
-        
+
         assert os.path.exists(path)
-        
+
         # Check content
         with open(path) as f:
             content = f.read()
@@ -85,7 +83,7 @@ class TestFindSimilarNotes:
             {"path": "/note2.md", "content": "Java coding best practices"},
             {"path": "/note3.md", "content": "Python tutorial guide advanced"},
         ]
-        
+
         # Should return a list (may be empty)
         matches = find_similar_notes(notes[0], notes[1:])
         assert isinstance(matches, list)
@@ -101,9 +99,9 @@ class TestAnalyzeLinks:
             {"path": "/b.md", "content": "Link to [[c]]."},
             {"path": "/c.md", "content": "No links."},
         ]
-        
+
         graph = analyze_links(notes)
-        
+
         # Should return dict with expected keys
         assert "graph" in graph
         assert "backlinks" in graph
@@ -128,7 +126,7 @@ Content about first idea.
 Content about second idea.
 """
         result = split_atomic_notes(content, "original.md")
-        
+
         assert len(result) >= 2
 
     def test_preserves_frontmatter(self):
@@ -145,6 +143,6 @@ tags: [python, notes]
 Content one.
 """
         result = split_atomic_notes(content, "test.md")
-        
+
         # First result should have frontmatter
         assert len(result) > 0

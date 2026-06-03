@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import os
 import re
 from datetime import datetime
 from pathlib import Path
-
 
 TEXT_EXTENSIONS = {"txt", "md", "csv", "log", "json", "yaml", "yml"}
 
@@ -33,7 +31,7 @@ def _read_text_excerpt(file_path: str, max_chars: int = 4000) -> str:
         return ""
 
     try:
-        with open(file_path, "r", encoding="utf-8", errors="ignore") as handle:
+        with open(file_path, encoding="utf-8", errors="ignore") as handle:
             return handle.read(max_chars)
     except OSError:
         return ""
@@ -68,7 +66,8 @@ def infer_context_description(file_path: str) -> tuple[str, str]:
     path = Path(file_path)
     tags = generate_content_tags(file_path)
     source_text = f"{path.stem} {_read_text_excerpt(file_path)}"
-    terms = [term for term in _extract_terms(source_text) if term not in {"this", "that", "with", "from", "file"}]
+    stop_words = {"this", "that", "with", "from", "file"}
+    terms = [term for term in _extract_terms(source_text) if term not in stop_words]
 
     context = next((tag for tag in tags if tag in TAG_KEYWORDS), tags[0] if tags else "file")
 

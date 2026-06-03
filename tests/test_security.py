@@ -1,13 +1,12 @@
 """Tests for security functions."""
 
 import os
-import pytest
 import sys
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_server import validate_path, safe_join_path, sanitize_filename
+from mcp_server import safe_join_path, sanitize_filename, validate_path
 
 
 class TestValidatePath:
