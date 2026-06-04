@@ -68,7 +68,7 @@ rm -rf /tmp/test /tmp/backup
 
 ```bash
 curl http://localhost:5000/health
-# Expected: {"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.0.0"}
+# Expected: {"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"}
 ```
 
 ### Organization Endpoint
