@@ -53,7 +53,7 @@ python -m pytest tests/ -v
 
 # Test MCP server manually
 cd /path/to/file-org-wiz
-python src/mcp_server.py --port 5000 --mount /tmp/test --backup /tmp/backup &
+file-org-wiz --port 5000 --mount /tmp/test --backup /tmp/backup &
 sleep 2
 curl localhost:5000/health
 

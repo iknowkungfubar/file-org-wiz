@@ -35,14 +35,14 @@
 # 1. Navigate to file-org-wiz
 cd /path/to/file-org-wiz
 
-# 2. Install dependencies
-pip install -r requirements.txt
+# 2. Install the package
+pip install -e .
 
-# 3. Start server
-python src/mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
+# Or install with pipx
+pipx install .
 
-# 4. Test
-curl http://localhost:5000/health
+# 3. Start the server
+file-org-wiz --port 5000 --mount /path/to/organize
 ```
 
 ### Option B: System-Specific

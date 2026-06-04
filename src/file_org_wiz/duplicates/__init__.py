@@ -129,7 +129,7 @@ def find_duplicates_by_name_similarity(file_list, threshold=0.8):
 
 def find_all_duplicates(base_path, by_content=True, by_name=True):
     """Find all duplicates in a directory."""
-    from scanner import scan_files_recursive
+    from file_org_wiz.scanner import scan_files_recursive
 
     # Scan all files
     files = scan_files_recursive(base_path)

@@ -4,6 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
+[![PyPI](https://img.shields.io/pypi/v/file-org-wiz)](https://pypi.org/project/file-org-wiz/)
 [![Tests](https://img.shields.io/badge/tests-97%20passed-green)](tests/)
 
 A complete file organization system that provides tools to reorganize any computer's files with consistent structure, naming conventions, and documentation using the PARA (Projects, Areas, Resources, Archive) methodology combined with Zettelkasten principles.
@@ -27,34 +28,43 @@ A complete file organization system that provides tools to reorganize any comput
 
 ## Quick Start
 
-1. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Install
 
-2. **Start the MCP server**:
-   ```bash
-   python src/mcp_server.py --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP &
-   ```
+```bash
+# Install from source
+pip install -e .
 
-3. **Test**:
-   ```bash
-   curl http://localhost:5000/health
-   ```
+# Or install with pipx (recommended for CLI tools)
+pipx install .
+```
 
-4. **Preview (dry-run)**:
-   ```bash
-   curl -X POST http://localhost:5000/organize \
-     -H "Content-Type: application/json" \
-     -d '{"mount_path": "/YOUR/MOUNT", "dry_run": true}'
-   ```
+### Start the MCP server:
 
-5. **Organize (for real)**:
-   ```bash
-   curl -X POST http://localhost:5000/organize \
-     -H "Content-Type: application/json" \
-     -d '{"mount_path": "/YOUR/MOUNT", "backup_path": "/YOUR/BACKUP", "do_backup": true}'
-   ```
+```bash
+file-org-wiz --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP
+```
+
+### Test:
+
+```bash
+curl http://localhost:5000/health
+```
+
+### Preview (dry-run):
+
+```bash
+curl -X POST http://localhost:5000/organize \
+  -H "Content-Type: application/json" \
+  -d '{"mount_path": "/YOUR/MOUNT", "dry_run": true}'
+```
+
+### Organize (for real):
+
+```bash
+curl -X POST http://localhost:5000/organize \
+  -H "Content-Type: application/json" \
+  -d '{"mount_path": "/YOUR/MOUNT", "backup_path": "/YOUR/BACKUP", "do_backup": true}'
+```
 
 ## API Endpoints
 

@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 try:
-    from file_intelligence import generate_content_tags, suggest_smart_filename
+    from file_org_wiz.file_intelligence import generate_content_tags, suggest_smart_filename
 except ImportError:
     generate_content_tags = None
     suggest_smart_filename = None

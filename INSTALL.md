@@ -66,7 +66,7 @@ cp SKILL.md ~/.opencode/skills/file-org-wiz/SKILL.md
 ./file-org-wiz-aider.sh
 
 # Advanced: MCP server
-python src/mcp_server.py --port 5001 &
+file-org-wiz --port 5001 &
 ```
 
 ### Cursor/Windsurf
@@ -88,7 +88,7 @@ python src/mcp_server.py --port 5001 &
 📄 [`docs/install/mcp_generic.md`](docs/install/mcp_generic.md)
 
 ```bash
-python src/mcp_server.py --port 5000 &
+file-org-wiz --port 5000 &
 curl -X POST localhost:5000/organize ...
 ```
 
@@ -105,7 +105,7 @@ curl -X POST localhost:5000/organize ...
 
 ## Default Paths
 
-Edit in `src/mcp_server.py` or use environment variables:
+Edit in `file-org-wiz` CLI args or use environment variables:
 
 ```bash
 export FILE_ORG_WIZ_MOUNT=/your/mount
@@ -122,7 +122,7 @@ export FILE_ORG_WIZ_VAULT=/your/vault
 ```bash
 cd /path/to/file-org-wiz
 pip install -r requirements.txt
-python src/mcp_server.py --port 5000 --mount /tmp/test --backup /tmp/backup &
+file-org-wiz --port 5000 --mount /tmp/test --backup /tmp/backup &
 sleep 2
 
 # Health check
@@ -170,13 +170,13 @@ lsof -i :5000
 
 # Kill and restart
 kill $(lsof -ti:5000)
-python src/mcp_server.py --port 5001 &
+file-org-wiz --port 5001 &
 ```
 
 ### Permission Denied
 
 ```bash
-chmod +x src/mcp_server.py
+chmod +x $(which file-org-wiz)
 ```
 
 ### Path Not Found
@@ -192,7 +192,7 @@ Use absolute paths, not relative:
 ### Custom Port
 
 ```bash
-python src/mcp_server.py --port 5001
+file-org-wiz --port 5001
 ```
 
 ### Environment Variables
@@ -202,7 +202,7 @@ export MOUNT_PATH=/your/mount
 export BACKUP_PATH=/your/backup  
 export VAULT_PATH=/your/vault
 
-python src/mcp_server.py
+file-org-wiz
 ```
 
 ### Production (gunicorn)
@@ -274,7 +274,7 @@ See [SECURITY.md](SECURITY.md) for full security documentation.
 
 - `README.md` - Main overview
 - `SKILL.md` - OpenCode skill
-- `src/mcp_server.py` - MCP server code
+- `file-org-wiz` CLI command - MCP server entry point
 - `AI_File_Organization_Agent_Prompt.md` - Full prompt
 - `Why_PARA_Zettelkasten.md` - Methodology explanation
 - `docs/research/` - Source documentation

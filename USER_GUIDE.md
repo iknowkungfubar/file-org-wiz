@@ -243,7 +243,7 @@ Use nested tags for flexibility:
 Start server:
 
 ```bash
-python src/mcp_server.py --port 5000 \
+file-org-wiz --port 5000 \
   --mount /your/mount \
   --backup /your/backup
 ```

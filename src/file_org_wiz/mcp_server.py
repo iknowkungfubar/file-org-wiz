@@ -34,26 +34,26 @@ from flask_cors import CORS
 
 # Import scanner and duplicates modules
 try:
-    from scanner import scan_and_categorize, suggest_category
+    from file_org_wiz.scanner import scan_and_categorize, suggest_category
 except ImportError:
     scan_and_categorize = None
     suggest_category = None
 
 try:
-    from duplicates import find_all_duplicates, merge_all_duplicates
+    from file_org_wiz.duplicates import find_all_duplicates, merge_all_duplicates
 except ImportError:
     find_all_duplicates = None
     merge_all_duplicates = None
 
 # Import NLP processor
 try:
-    from nlp_processor import generate_mcp_payload, parse_organization_command
+    from file_org_wiz.nlp_processor import generate_mcp_payload, parse_organization_command
 except ImportError:
     parse_organization_command = None
     generate_mcp_payload = None
 
 try:
-    from file_intelligence import generate_content_tags, infer_context_description
+    from file_org_wiz.file_intelligence import generate_content_tags, infer_context_description
 except ImportError:
     infer_context_description = None
     generate_content_tags = None
@@ -750,7 +750,7 @@ def analyze_file_endpoint() -> tuple[Response, int]:
         tags = []
 
     try:
-        from file_intelligence import suggest_smart_filename
+        from file_org_wiz.file_intelligence import suggest_smart_filename
 
         suggested_name = suggest_smart_filename(file_path)
     except ImportError:
@@ -1039,13 +1039,16 @@ def mcp_manifest() -> Response:
 # Main Entry Point
 # =============================================================================
 
-if __name__ == "__main__":
+
+def main() -> None:
     import argparse
+
+    global MOUNT_PATH, BACKUP_PATH, VAULT_PATH
 
     parser = argparse.ArgumentParser(
         description="File Org Wiz MCP Server",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+        epilog="""\
 Security Notes:
   - Default binding is localhost only (127.0.0.1)
   - CORS is disabled by default
@@ -1102,3 +1105,7 @@ For Production:
 
     # Security: Disable debug mode in production
     app.run(host=args.host, port=args.port, debug=False)
+
+
+if __name__ == "__main__":
+    main()
