@@ -218,11 +218,11 @@ See [SECURITY.md](SECURITY.md) for our security policy and reporting guidelines.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on our development process, coding standards, PR workflow, and code of conduct.
 
 ## License
 
-See [LICENSE](LICENSE) for licensing details.
+MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
