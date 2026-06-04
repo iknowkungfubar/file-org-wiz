@@ -9,7 +9,7 @@ import pytest
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_server import app
+from file_org_wiz.mcp_server import app
 
 
 @pytest.fixture
@@ -48,7 +48,11 @@ class TestOrganizeEndpoint:
         """Organize without backup should succeed."""
         response = client.post(
             "/organize",
-            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": False},
+            json={
+                "mount_path": mount_dir,
+                "backup_path": backup_dir,
+                "do_backup": False,
+            },
         )
         data = json.loads(response.data)
 
@@ -59,7 +63,11 @@ class TestOrganizeEndpoint:
         """Organize should create PARA folder structure."""
         client.post(
             "/organize",
-            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": False},
+            json={
+                "mount_path": mount_dir,
+                "backup_path": backup_dir,
+                "do_backup": False,
+            },
         )
 
         for folder in ["00_INBOX", "01_PROJECTS", "02_AREAS"]:
@@ -77,7 +85,11 @@ class TestOrganizeEndpoint:
         """Organize with backup should create backup."""
         response = client.post(
             "/organize",
-            json={"mount_path": mount_dir, "backup_path": backup_dir, "do_backup": True},
+            json={
+                "mount_path": mount_dir,
+                "backup_path": backup_dir,
+                "do_backup": True,
+            },
         )
         data = json.loads(response.data)
 
@@ -100,9 +112,13 @@ class TestOrganizeEndpoint:
 
         assert response.status_code == 200
         phases = data.get("phases", [])
-        template_phase = next((p for p in phases if p["name"] == "apply_template"), None)
+        template_phase = next(
+            (p for p in phases if p["name"] == "apply_template"), None
+        )
         assert template_phase is not None
-        assert os.path.exists(os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices"))
+        assert os.path.exists(
+            os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices")
+        )
 
 
 class TestBackupEndpoint:
@@ -163,7 +179,9 @@ class TestAnalyticsEndpoint:
     """Tests for /analytics endpoint."""
 
     def test_analytics_returns_metrics(self, client, mount_dir):
-        with open(os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8") as handle:
+        with open(
+            os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8"
+        ) as handle:
             handle.write("invoice total")
         with open(os.path.join(mount_dir, "notes.md"), "w", encoding="utf-8") as handle:
             handle.write("meeting notes")
@@ -199,7 +217,11 @@ class TestApplyNamesEndpoint:
         """Apply names with nonexistent file should return error."""
         response = client.post(
             "/apply-names",
-            json={"file_path": "/nonexistent/file.txt", "context": "test", "description": "test"},
+            json={
+                "file_path": "/nonexistent/file.txt",
+                "context": "test",
+                "description": "test",
+            },
         )
 
         assert response.status_code == 400
@@ -271,7 +293,9 @@ class TestNlpCommandEndpoint:
     def test_apply_names_can_auto_describe(self, client, mount_dir):
         test_file = os.path.join(mount_dir, "scan001.txt")
         with open(test_file, "w", encoding="utf-8") as handle:
-            handle.write("Invoice for April website project. Client tax summary enclosed.")
+            handle.write(
+                "Invoice for April website project. Client tax summary enclosed."
+            )
 
         response = client.post(
             "/apply-names",

@@ -40,6 +40,13 @@ Documentation = "https://github.com/iknowkungfubar/file-org-wiz#readme"
 [project.scripts]
 file-org-wiz = "file_org_wiz.mcp_server:main"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.3.0",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["file_org_wiz*"]

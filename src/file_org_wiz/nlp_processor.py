@@ -91,7 +91,9 @@ def _extract_date_filters(command: str) -> dict[str, Any]:
 
 def _extract_target_path(command: str) -> str | None:
     for keyword in FOLDER_PATHS:
-        if re.search(rf"\b{keyword[:-1] if keyword.endswith('s') else keyword}s?\b", command):
+        if re.search(
+            rf"\b{keyword[:-1] if keyword.endswith('s') else keyword}s?\b", command
+        ):
             return _expand_folder(keyword)
     return None
 
@@ -121,7 +123,8 @@ def parse_organization_command(command: str) -> dict[str, Any]:
         "filters": filters,
         "destination": _extract_destination(command_lower),
         "dry_run": any(
-            phrase in command_lower for phrase in ["preview", "dry run", "simulate", "test"]
+            phrase in command_lower
+            for phrase in ["preview", "dry run", "simulate", "test"]
         ),
     }
 

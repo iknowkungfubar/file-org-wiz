@@ -51,11 +51,8 @@ def sample_files(mount_dir):
 def client():
     """Create a test client for the Flask app."""
     # Import here to avoid circular imports
-    import sys
 
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-    from mcp_server import app
+    from file_org_wiz.mcp_server import app
 
     app.config["TESTING"] = True
     with app.test_client() as client:
@@ -65,11 +62,8 @@ def client():
 @pytest.fixture
 def app():
     """Create a test Flask app."""
-    import sys
 
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-    from mcp_server import app
+    from file_org_wiz.mcp_server import app
 
     app.config["TESTING"] = True
     return app

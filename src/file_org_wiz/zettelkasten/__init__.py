@@ -43,7 +43,9 @@ def extract_wikilinks_from_file(file_path: str) -> list[str]:
 # =============================================================================
 
 
-def generate_moc_content(topic_name: str, notes: list[str], add_wikilinks: bool = True) -> str:
+def generate_moc_content(
+    topic_name: str, notes: list[str], add_wikilinks: bool = True
+) -> str:
     """
     Generate MOC (Map of Content) content for a topic.
 
@@ -106,7 +108,9 @@ def create_moc_file(
     return output_path
 
 
-def scan_for_moc_candidates(vault_path: str, min_notes: int = 5) -> dict[str, list[str]]:
+def scan_for_moc_candidates(
+    vault_path: str, min_notes: int = 5
+) -> dict[str, list[str]]:
     """
     Find folders that need MOC files.
 
@@ -131,7 +135,9 @@ def scan_for_moc_candidates(vault_path: str, min_notes: int = 5) -> dict[str, li
     return candidates
 
 
-def generate_all_mocs(vault_path: str, output_path: str | None = None) -> dict[str, Any]:
+def generate_all_mocs(
+    vault_path: str, output_path: str | None = None
+) -> dict[str, Any]:
     """
     Generate MOC files for all folders with sufficient notes.
 
@@ -183,7 +189,9 @@ def generate_all_mocs(vault_path: str, output_path: str | None = None) -> dict[s
 
 
 def find_similar_notes(
-    target_note: dict[str, Any], all_notes: list[dict[str, Any]], min_similarity: float = 0.3
+    target_note: dict[str, Any],
+    all_notes: list[dict[str, Any]],
+    min_similarity: float = 0.3,
 ) -> list[dict[str, Any]]:
     """
     Find notes similar to target note based on content keywords.
@@ -297,7 +305,10 @@ def analyze_links(notes: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def suggest_links(
-    note_path: str, content: str, all_notes: list[dict[str, Any]], max_suggestions: int = 5
+    note_path: str,
+    content: str,
+    all_notes: list[dict[str, Any]],
+    max_suggestions: int = 5,
 ) -> list[dict[str, Any]]:
     """
     Suggest links for a note based on content similarity.

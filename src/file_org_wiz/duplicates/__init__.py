@@ -25,7 +25,9 @@ def find_duplicates_by_size(files):
             size_groups[size].append(f)
 
     # Return only groups with potential duplicates
-    return {size: file_list for size, file_list in size_groups.items() if len(file_list) > 1}
+    return {
+        size: file_list for size, file_list in size_groups.items() if len(file_list) > 1
+    }
 
 
 def quick_hash_file(file_path):
@@ -219,7 +221,9 @@ def get_oldest_file(file_list):
     return oldest or file_list[0]
 
 
-def merge_duplicates(duplicate_group, keep_strategy="newest", archive_path="", dry_run=True):
+def merge_duplicates(
+    duplicate_group, keep_strategy="newest", archive_path="", dry_run=True
+):
     """
     Merge a duplicate file group.
 
@@ -262,7 +266,9 @@ def merge_duplicates(duplicate_group, keep_strategy="newest", archive_path="", d
                 # Handle name conflicts
                 if os.path.exists(arch_path):
                     base, ext = os.path.splitext(arch_path)
-                    arch_path = f"{base}_dup_{datetime.now().strftime('%Y%m%d%H%M%S')}{ext}"
+                    arch_path = (
+                        f"{base}_dup_{datetime.now().strftime('%Y%m%d%H%M%S')}{ext}"
+                    )
 
                 shutil.move(path, arch_path)
                 archived.append(path)
@@ -290,7 +296,12 @@ def merge_duplicates(duplicate_group, keep_strategy="newest", archive_path="", d
 
 
 def merge_all_duplicates(
-    base_path, keep_strategy="newest", archive_path="", by_content=True, by_name=True, dry_run=True
+    base_path,
+    keep_strategy="newest",
+    archive_path="",
+    by_content=True,
+    by_name=True,
+    dry_run=True,
 ):
     """Find and merge all duplicates in a directory."""
     # Find duplicates
@@ -310,7 +321,10 @@ def merge_all_duplicates(
 
     for group in duplicate_groups:
         merge_result = merge_duplicates(
-            group, keep_strategy=keep_strategy, archive_path=archive_path, dry_run=dry_run
+            group,
+            keep_strategy=keep_strategy,
+            archive_path=archive_path,
+            dry_run=dry_run,
         )
         results["merges"].append(merge_result)
         results["total_saved_bytes"] += merge_result.get("saved_bytes", 0)

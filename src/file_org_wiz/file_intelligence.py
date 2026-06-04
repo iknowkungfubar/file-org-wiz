@@ -69,7 +69,9 @@ def infer_context_description(file_path: str) -> tuple[str, str]:
     stop_words = {"this", "that", "with", "from", "file"}
     terms = [term for term in _extract_terms(source_text) if term not in stop_words]
 
-    context = next((tag for tag in tags if tag in TAG_KEYWORDS), tags[0] if tags else "file")
+    context = next(
+        (tag for tag in tags if tag in TAG_KEYWORDS), tags[0] if tags else "file"
+    )
 
     preferred_terms: list[str] = []
     for term in terms:

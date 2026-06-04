@@ -1,12 +1,10 @@
 """Tests for core functions."""
 
 import os
-import sys
 
 # Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_server import (
+from file_org_wiz.mcp_server import (
     apply_naming_convention,
     create_analytics_report,
     create_backup,
@@ -144,7 +142,9 @@ class TestApplyNamingConvention:
         with open(test_file, "w") as f:
             f.write("content")
 
-        result = apply_naming_convention(test_file, "Project Name With Spaces!", "Test Doc", 1)
+        result = apply_naming_convention(
+            test_file, "Project Name With Spaces!", "Test Doc", 1
+        )
 
         assert result["success"] is True
         # Context should be lowercase with no spaces
@@ -160,8 +160,12 @@ class TestCreateTemplateStructure:
         result = create_template_structure(mount_dir, "finance")
 
         assert result["errors"] == []
-        assert any(path.endswith("02_AREAS/Finance/Invoices") for path in result["created"])
-        assert os.path.exists(os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices"))
+        assert any(
+            path.endswith("02_AREAS/Finance/Invoices") for path in result["created"]
+        )
+        assert os.path.exists(
+            os.path.join(mount_dir, "02_AREAS", "Finance", "Invoices")
+        )
 
     def test_unknown_template_returns_error(self, mount_dir):
         result = create_template_structure(mount_dir, "unknown")
@@ -174,7 +178,9 @@ class TestCreateAnalyticsReport:
     """Tests for analytics report generation."""
 
     def test_reports_file_totals_and_distribution(self, mount_dir):
-        with open(os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8") as handle:
+        with open(
+            os.path.join(mount_dir, "invoice.pdf"), "w", encoding="utf-8"
+        ) as handle:
             handle.write("invoice")
         with open(os.path.join(mount_dir, "notes.md"), "w", encoding="utf-8") as handle:
             handle.write("notes")
@@ -187,9 +193,13 @@ class TestCreateAnalyticsReport:
         assert result["total_size_bytes"] > 0
 
     def test_reports_duplicate_metrics(self, mount_dir):
-        with open(os.path.join(mount_dir, "copy-a.txt"), "w", encoding="utf-8") as handle:
+        with open(
+            os.path.join(mount_dir, "copy-a.txt"), "w", encoding="utf-8"
+        ) as handle:
             handle.write("same-content")
-        with open(os.path.join(mount_dir, "copy-b.txt"), "w", encoding="utf-8") as handle:
+        with open(
+            os.path.join(mount_dir, "copy-b.txt"), "w", encoding="utf-8"
+        ) as handle:
             handle.write("same-content")
 
         result = create_analytics_report(mount_dir)

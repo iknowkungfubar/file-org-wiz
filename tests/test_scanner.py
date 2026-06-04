@@ -1,11 +1,9 @@
 # Tests for scanner module
 
 import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from scanner import (
+from file_org_wiz.scanner import (
     classify_by_extension,
     classify_by_name,
     scan_and_categorize,

@@ -1,11 +1,9 @@
 # Tests for duplicates module
 
 import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from duplicates import (
+from file_org_wiz.duplicates import (
     find_duplicates_by_size,
     format_bytes,
     full_hash_file,

@@ -1,11 +1,9 @@
 # Tests for Zettelkasten module
 
 import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from zettelkasten import (
+from file_org_wiz.zettelkasten import (
     analyze_links,
     create_moc_file,
     extract_wikilinks,
@@ -79,7 +77,10 @@ class TestFindSimilarNotes:
     def test_finds_keyword_matches(self):
         """Should attempt to find similar notes."""
         notes = [
-            {"path": "/note1.md", "content": "Python programming tips and tricks for beginners"},
+            {
+                "path": "/note1.md",
+                "content": "Python programming tips and tricks for beginners",
+            },
             {"path": "/note2.md", "content": "Java coding best practices"},
             {"path": "/note3.md", "content": "Python tutorial guide advanced"},
         ]

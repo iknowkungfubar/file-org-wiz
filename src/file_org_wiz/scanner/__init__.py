@@ -9,7 +9,10 @@ from datetime import datetime
 from pathlib import Path
 
 try:
-    from file_org_wiz.file_intelligence import generate_content_tags, suggest_smart_filename
+    from file_org_wiz.file_intelligence import (
+        generate_content_tags,
+        suggest_smart_filename,
+    )
 except ImportError:
     generate_content_tags = None
     suggest_smart_filename = None
@@ -128,8 +131,12 @@ def scan_files_recursive(base_path, max_depth=10, include_hidden=False):
                             "name": filename,
                             "extension": Path(filename).suffix.lstrip(".").lower(),
                             "size": stat.st_size,
-                            "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                            "created": datetime.fromtimestamp(stat.st_ctime).isoformat(),
+                            "modified": datetime.fromtimestamp(
+                                stat.st_mtime
+                            ).isoformat(),
+                            "created": datetime.fromtimestamp(
+                                stat.st_ctime
+                            ).isoformat(),
                             "depth": depth + 1,
                         }
                     )
@@ -190,7 +197,9 @@ def classify_file(file_info, use_date=True):
     """Classify a file to suggested PARA category."""
     extension_category = classify_by_extension(file_info.get("extension", ""))
     name_category = classify_by_name(file_info.get("name", ""))
-    date_category = classify_by_date(file_info.get("modified", "")) if use_date else None
+    date_category = (
+        classify_by_date(file_info.get("modified", "")) if use_date else None
+    )
 
     # Priority: name > extension > date
     if date_category == "04_ARCHIVE" and not name_category:
@@ -214,7 +223,11 @@ def classify_file(file_info, use_date=True):
             "reason": f"file type suggests {extension_category}",
         }
 
-    return {"category": "03_RESOURCES", "confidence": "low", "reason": "default category"}
+    return {
+        "category": "03_RESOURCES",
+        "confidence": "low",
+        "reason": "default category",
+    }
 
 
 def scan_and_categorize(base_path, max_depth=10, use_date=True):
@@ -238,7 +251,9 @@ def scan_and_categorize(base_path, max_depth=10, use_date=True):
         if generate_content_tags:
             file_info["tags"] = generate_content_tags(file_info.get("path", ""))
         if suggest_smart_filename:
-            file_info["suggested_name"] = suggest_smart_filename(file_info.get("path", ""))
+            file_info["suggested_name"] = suggest_smart_filename(
+                file_info.get("path", "")
+            )
 
         categorized.append(file_info)
 

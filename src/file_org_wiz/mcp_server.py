@@ -47,13 +47,19 @@ except ImportError:
 
 # Import NLP processor
 try:
-    from file_org_wiz.nlp_processor import generate_mcp_payload, parse_organization_command
+    from file_org_wiz.nlp_processor import (
+        generate_mcp_payload,
+        parse_organization_command,
+    )
 except ImportError:
     parse_organization_command = None
     generate_mcp_payload = None
 
 try:
-    from file_org_wiz.file_intelligence import generate_content_tags, infer_context_description
+    from file_org_wiz.file_intelligence import (
+        generate_content_tags,
+        infer_context_description,
+    )
 except ImportError:
     infer_context_description = None
     generate_content_tags = None
@@ -94,7 +100,15 @@ PARA_FOLDERS: list[str] = [
 # Sub-folders by category
 PROJECT_SUBDIRS: list[str] = ["01_Projects", "02_Client-Work", "03_Personal"]
 AREA_SUBDIRS: list[str] = ["Health", "Finance", "Home", "Learning", "Personal"]
-RESOURCE_SUBDIRS: list[str] = ["AI", "Tech", "Career", "Development", "Media", "Reading", "Tools"]
+RESOURCE_SUBDIRS: list[str] = [
+    "AI",
+    "Tech",
+    "Career",
+    "Development",
+    "Media",
+    "Reading",
+    "Tools",
+]
 
 TEMPLATE_STRUCTURES: dict[str, list[str]] = {
     "finance": [
@@ -277,7 +291,9 @@ def create_backup(source_path: str, backup_path: str) -> dict[str, Any]:
 
             if os.path.isdir(src):
                 try:
-                    shutil.copytree(src, dst, symlinks=True, ignore_dangling_symlinks=True)
+                    shutil.copytree(
+                        src, dst, symlinks=True, ignore_dangling_symlinks=True
+                    )
                     created.append(f"{item}/")
                 except OSError as e:
                     errors.append(f"{item}/: {str(e)}")
@@ -367,7 +383,9 @@ def create_analytics_report(base_path: str) -> dict[str, Any]:
         }
 
     total_files = categorized.get("total_files", 0)
-    organization_percentage = round((para_files / total_files) * 100, 2) if total_files else 0.0
+    organization_percentage = (
+        round((para_files / total_files) * 100, 2) if total_files else 0.0
+    )
 
     return {
         "path": base_path,
@@ -375,7 +393,9 @@ def create_analytics_report(base_path: str) -> dict[str, Any]:
         "total_size_bytes": total_size_bytes,
         "file_types": dict(file_types),
         "category_distribution": categorized.get("summary", {}),
-        "top_tags": [{"tag": tag, "count": count} for tag, count in tag_counts.most_common(10)],
+        "top_tags": [
+            {"tag": tag, "count": count} for tag, count in tag_counts.most_common(10)
+        ],
         "largest_files": largest_files[:5],
         "organization_percentage": organization_percentage,
         "duplicates": duplicate_summary,
@@ -459,7 +479,9 @@ def apply_naming_convention(
 @app.route("/health", methods=["GET"])
 def health_check() -> Response:
     """Health check endpoint."""
-    return jsonify({"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"})
+    return jsonify(
+        {"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"}
+    )
 
 
 @app.route("/organize", methods=["POST"])
@@ -566,7 +588,9 @@ def organize() -> tuple[Response, int]:
             result["phases"].append(
                 {
                     "name": "apply_template",
-                    "status": "complete" if not template_result.get("errors") else "failed",
+                    "status": "complete"
+                    if not template_result.get("errors")
+                    else "failed",
                     "template": template,
                     "folders_created": len(template_result["created"]),
                     "errors": template_result.get("errors", []),
@@ -587,7 +611,9 @@ def organize() -> tuple[Response, int]:
                 }
             )
         else:
-            result["phases"].append({"name": "create_vault", "status": "failed", "error": error})
+            result["phases"].append(
+                {"name": "create_vault", "status": "failed", "error": error}
+            )
 
     # Phase 4: Duplicate Detection (optional)
     if find_all_duplicates and not dry_run:
@@ -890,7 +916,9 @@ def nlp_command_endpoint() -> tuple[Response, int]:
                 result["phases"].append(
                     {
                         "name": "apply_template",
-                        "status": "complete" if not template_result.get("errors") else "failed",
+                        "status": "complete"
+                        if not template_result.get("errors")
+                        else "failed",
                         "template": template,
                         "folders_created": len(template_result["created"]),
                         "errors": template_result.get("errors", []),
@@ -1004,7 +1032,10 @@ def mcp_manifest() -> Response:
                 {
                     "name": "analytics",
                     "description": "Get file organization analytics and dashboard metrics",
-                    "input": {"type": "object", "properties": {"path": {"type": "string"}}},
+                    "input": {
+                        "type": "object",
+                        "properties": {"path": {"type": "string"}},
+                    },
                 },
                 {
                     "name": "apply_names",
@@ -1023,12 +1054,18 @@ def mcp_manifest() -> Response:
                 {
                     "name": "analyze_file",
                     "description": "Generate tags and a smart filename suggestion for a file",
-                    "input": {"type": "object", "properties": {"file_path": {"type": "string"}}},
+                    "input": {
+                        "type": "object",
+                        "properties": {"file_path": {"type": "string"}},
+                    },
                 },
                 {
                     "name": "nlp_command",
                     "description": "Process natural language file organization commands",
-                    "input": {"type": "object", "properties": {"command": {"type": "string"}}},
+                    "input": {
+                        "type": "object",
+                        "properties": {"command": {"type": "string"}},
+                    },
                 },
             ],
         }
@@ -1061,18 +1098,28 @@ For Production:
   - Use HTTPS in production
         """,
     )
-    parser.add_argument("--port", type=int, default=5000, help="Port to run server (default: 5000)")
+    parser.add_argument(
+        "--port", type=int, default=5000, help="Port to run server (default: 5000)"
+    )
     parser.add_argument(
         "--host",
         type=str,
         default="127.0.0.1",
         help="Host to bind (default: 127.0.0.1 for security)",
     )
-    parser.add_argument("--mount", type=str, default=MOUNT_PATH, help="Default mount path")
-    parser.add_argument("--backup", type=str, default=BACKUP_PATH, help="Default backup path")
-    parser.add_argument("--vault", type=str, default=VAULT_PATH, help="Default vault path")
     parser.add_argument(
-        "--cors", action="store_true", help="Enable CORS (use with caution - security risk)"
+        "--mount", type=str, default=MOUNT_PATH, help="Default mount path"
+    )
+    parser.add_argument(
+        "--backup", type=str, default=BACKUP_PATH, help="Default backup path"
+    )
+    parser.add_argument(
+        "--vault", type=str, default=VAULT_PATH, help="Default vault path"
+    )
+    parser.add_argument(
+        "--cors",
+        action="store_true",
+        help="Enable CORS (use with caution - security risk)",
     )
 
     args = parser.parse_args()

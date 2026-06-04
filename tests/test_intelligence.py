@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from file_intelligence import generate_content_tags, suggest_smart_filename
-from nlp_processor import generate_mcp_payload, parse_organization_command
+from file_org_wiz.file_intelligence import generate_content_tags, suggest_smart_filename
+from file_org_wiz.nlp_processor import generate_mcp_payload, parse_organization_command
 
 
 class TestNaturalLanguageParsing:
@@ -47,7 +45,9 @@ class TestContentTagging:
     def test_suggests_descriptive_filename(self, mount_dir):
         file_path = os.path.join(mount_dir, "scan001.txt")
         with open(file_path, "w", encoding="utf-8") as handle:
-            handle.write("Team meeting notes about project launch timeline and client milestones.")
+            handle.write(
+                "Team meeting notes about project launch timeline and client milestones."
+            )
 
         suggested = suggest_smart_filename(file_path)
 

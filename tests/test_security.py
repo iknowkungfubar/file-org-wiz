@@ -1,12 +1,10 @@
 """Tests for security functions."""
 
 import os
-import sys
 
 # Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_server import safe_join_path, sanitize_filename, validate_path
+from file_org_wiz.mcp_server import safe_join_path, sanitize_filename, validate_path
 
 
 class TestValidatePath:
