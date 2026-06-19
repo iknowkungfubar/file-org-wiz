@@ -2,59 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Security
-- Pin all CI actions to immutable commit SHAs (supply chain hardening)
+## [1.3.0] - 2025-03-28
 
 ### Added
-- `.gitattributes` with language-specific text/binary classification
 
-## [1.2.0] — 2026-06-18
-
-### Added
+- Community infrastructure: CODE_OF_CONDUCT, issue/PR templates, SECURITY.md
+- Social preview image and docs deployment workflow (gh-pages)
 - AGENTS.md for agentic coding context
-- Social preview image and docs deployment workflow
 - Gitleaks secret scanning in CI pipeline
-- CI/CD hardening — permissions, dependabot, SECURITY.md
-- Community infrastructure: CODE_OF_CONDUCT, issue/PR templates
 
 ### Changed
-- Refactored `mcp_server.py` (1158 lines) into 3 focused modules
+
+- Refactored 1158-line `mcp_server.py` into 3 focused modules (file_intelligence.py, nlp_processor.py, scanner/)
 - README scope claims reduced to match actual implementation
+- Community health files added for open-source sustainability
 
 ### Fixed
-- ruff E402 import violations (noqa annotations)
-- API test compatibility — phases format, backup status, NLP skipif
+
+- REST API test compatibility — phases format, backup status endpoint, NLP skipif condition
 - Backward-compatible error format in `create_backup`
-- Re-exports restored in `mcp_server.py` for test compatibility
-- Ruff formatting and lint
+- Re-exports in `mcp_server.py` restored for test compatibility
+- Ruff lint/formatting issues across the codebase
+- E402 import violations with noqa annotations
 
-## [1.1.0] — 2026-06-03
-
-### Added
-- Proper pyproject.toml packaging
-- `src/file_org_wiz/` package structure
-
-### Changed
-- Restructured from flat layout to `src/file_org_wiz/` package
-- Standardized CONTRIBUTING.md and README contributing/license sections
-
-### Fixed
-- Dev extras and test imports for packaging restructure
-- Stale version in CONTRIBUTING.md health example
-- All open issues resolved
-
-## [1.0.0] — 2026-04-25
+## [1.2.0] - 2025-03-10
 
 ### Added
-- AI-powered file organization system (PARA + Zettelkasten methodology)
-- MCP server (Flask-based HTTP API)
-- File intelligence: auto-tagging, semantic analysis, filename suggestion
-- NLP processor: natural language command parsing
-- Recursive file scanning and categorization
+
+- Initial release with PARA + Zettelkasten methodology
+- MCP server with Flask HTTP API
+- File scanning and categorization engine
 - Duplicate detection (content hash + name similarity)
-- Dry-run mode, analytics dashboard, backup integration
+- Zettelkasten integration: MOCs, atomic notes, bidirectional links
+- Natural language command parsing
+- Auto-tagging and smart renaming
+- Analytics dashboard API
+- Template system (finance, research, media)
+- Dry-run mode for preview before applying changes
+- Path validation and security hardening
+
+[1.3.0]: https://github.com/iknowkungfubar/file-org-wiz/releases/tag/v1.3.0
+[1.2.0]: https://github.com/iknowkungfubar/file-org-wiz/releases/tag/v1.2.0

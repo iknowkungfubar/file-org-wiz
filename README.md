@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
 [![PyPI](https://img.shields.io/pypi/v/file-org-wiz)](https://pypi.org/project/file-org-wiz/)
-[![Tests](https://img.shields.io/badge/tests-97%20passed-green)](tests/)
+[![Tests](https://img.shields.io/badge/tests-96%20passed-green)](tests/)
 
 A complete file organization system that provides tools to reorganize any computer's files with consistent structure, naming conventions, and documentation using the PARA (Projects, Areas, Resources, Archive) methodology combined with Zettelkasten principles.
 
