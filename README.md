@@ -22,9 +22,9 @@ A complete file organization system that provides tools to reorganize any comput
 - **Templates**: Apply finance, research, and media folder templates instantly
 - **Analytics Dashboard API**: Inspect file types, categories, duplicate waste, tags, and largest files
 - **dry-Run Mode**: Preview changes before applying
-- **Skill System**: Direct integration with OpenCode and other AI tools
-- **Multi-System Support**: Works with Claude, Copilot, Cursor, Codex, and 15+ other AI systems
 - **Safe by Design**: Path validation, backup-first execution, no data deletion without confirmation
+
+> **Integration status**: MCP server is the primary interface. Direct integration docs are available for [Claude Desktop](docs/install/claude_desktop.md), [Aider](docs/install/aider.md), and [OpenCode](docs/install/opencode.md). Generic HTTP/MCP integration works with any AI coding assistant — see [MCP generic guide](docs/install/mcp_generic.md).
 
 ## Quick Start
 
