@@ -169,10 +169,14 @@ def create_backup(source_path: str, backup_path: str) -> dict[str, Any]:
     valid, error = validate_path(backup_path)
     if not valid:
         return {"backup_path": "", "files_copied": [], "errors": [error]}
-    
+
     # Check that source exists
     if not os.path.isdir(source_path):
-        return {"backup_path": "", "files_copied": [], "errors": [f"Source path does not exist: {source_path}"]}
+        return {
+            "backup_path": "",
+            "files_copied": [],
+            "errors": [f"Source path does not exist: {source_path}"],
+        }
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     dest_path = os.path.join(backup_path, f"backup__{timestamp}")
     created: list[str] = []
