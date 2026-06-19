@@ -9,14 +9,14 @@ import pytest
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from file_org_wiz.mcp_server import app
+from file_org_wiz.mcp_server import app  # noqa: E402
 
 # Check if NLP functions are actually available (not None stubs)
-from file_org_wiz.nlp_processor import parse_organization_command
+from file_org_wiz.nlp_processor import parse_organization_command  # noqa: E402
 
 NLP_AVAILABLE = parse_organization_command is not None
 
-from file_org_wiz.file_intelligence import infer_context_description
+from file_org_wiz.file_intelligence import infer_context_description  # noqa: E402
 
 INFERENCE_AVAILABLE = infer_context_description is not None
 
