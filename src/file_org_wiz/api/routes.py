@@ -79,25 +79,25 @@ def register_routes(app: Any) -> None:
                 }
             ), 200
 
-        results: dict[str, Any] = {"structure": {}, "backup": {}, "errors": []}
+        results: dict[str, Any] = {"phases": [], "errors": []}
 
         # Create folder structure
         structure_result = create_folder_structure(mount_path)
-        results["structure"] = structure_result
+        results["phases"].append({"name": "structure", **structure_result})
         if structure_result.get("errors"):
             results["errors"].extend(structure_result["errors"])
 
         # Apply template if specified
         if template:
             template_result = create_template_structure(mount_path, template)
-            results["template"] = template_result
+            results["phases"].append({"name": "apply_template", **template_result})
             if template_result.get("errors"):
                 results["errors"].extend(template_result["errors"])
 
         # Backup if requested
         if data.get("do_backup"):
             backup_result = create_backup(mount_path, backup_path)
-            results["backup"] = backup_result
+            results["phases"].append({"name": "backup", **backup_result})
             if backup_result.get("errors"):
                 results["errors"].extend(backup_result["errors"])
 
@@ -112,8 +112,7 @@ def register_routes(app: Any) -> None:
             "backup_path", os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup")
         )
         result = create_backup(source, dest)
-        status = 207 if result.get("errors") else 200
-        return jsonify(result), status
+        return jsonify(result), 200
 
     @app.route("/structure", methods=["GET"])
     def structure() -> tuple[Response, int]:
@@ -185,6 +184,7 @@ def register_routes(app: Any) -> None:
             if generate_mcp_payload:
                 payload = generate_mcp_payload(parsed)
                 payload["status"] = "parsed"
+                payload["parsed_command"] = parsed
                 return jsonify(payload), 200
         return jsonify(
             {"parsed": command, "message": "NLP processing not available"}
