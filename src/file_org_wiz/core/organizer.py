@@ -3,6 +3,7 @@
 Security validation, PARA folder structure creation, backups,
 analytics, naming conventions, and directory traversal.
 """
+
 from __future__ import annotations
 
 import os
@@ -29,34 +30,55 @@ except ImportError:
 # ── Constants ────────────────────────────────────────────────────────────────
 
 PARA_FOLDERS: list[str] = [
-    "00_INBOX", "01_PROJECTS", "02_AREAS", "03_RESOURCES",
-    "04_ARCHIVE", "90_TEMPLATES", "99_SYSTEM",
+    "00_INBOX",
+    "01_PROJECTS",
+    "02_AREAS",
+    "03_RESOURCES",
+    "04_ARCHIVE",
+    "90_TEMPLATES",
+    "99_SYSTEM",
 ]
 
 PROJECT_SUBDIRS: list[str] = ["01_Projects", "02_Client-Work", "03_Personal"]
 AREA_SUBDIRS: list[str] = ["Health", "Finance", "Home", "Learning", "Personal"]
 RESOURCE_SUBDIRS: list[str] = [
-    "AI", "Tech", "Career", "Development", "Media", "Reading", "Tools",
+    "AI",
+    "Tech",
+    "Career",
+    "Development",
+    "Media",
+    "Reading",
+    "Tools",
 ]
 
 TEMPLATE_STRUCTURES: dict[str, list[str]] = {
     "finance": [
-        "02_AREAS/Finance/Invoices", "02_AREAS/Finance/Taxes",
-        "02_AREAS/Finance/Receipts", "03_RESOURCES/Finance/Statements",
+        "02_AREAS/Finance/Invoices",
+        "02_AREAS/Finance/Taxes",
+        "02_AREAS/Finance/Receipts",
+        "03_RESOURCES/Finance/Statements",
     ],
     "research": [
-        "03_RESOURCES/Research/Papers", "03_RESOURCES/Research/Notes",
+        "03_RESOURCES/Research/Papers",
+        "03_RESOURCES/Research/Notes",
         "03_RESOURCES/Research/Datasets",
     ],
     "media": [
-        "03_RESOURCES/Media/Images", "03_RESOURCES/Media/Video",
+        "03_RESOURCES/Media/Images",
+        "03_RESOURCES/Media/Video",
         "03_RESOURCES/Media/Audio",
     ],
 }
 
 SENSITIVE_PREFIXES: tuple[str, ...] = (
-    "/etc", "/sys", "/proc", "/dev", "/boot",
-    "/root", "/.ssh", "/.aws",
+    "/etc",
+    "/sys",
+    "/proc",
+    "/dev",
+    "/boot",
+    "/root",
+    "/.ssh",
+    "/.aws",
 )
 
 
@@ -124,7 +146,10 @@ def create_folder_structure(base_path: str) -> dict[str, list[str]]:
             created.append(path)
         except OSError as e:
             errors.append(f"{path}: {e}")
-    for folder, subdirs in [("02_AREAS", AREA_SUBDIRS), ("03_RESOURCES", RESOURCE_SUBDIRS)]:
+    for folder, subdirs in [
+        ("02_AREAS", AREA_SUBDIRS),
+        ("03_RESOURCES", RESOURCE_SUBDIRS),
+    ]:
         base_folder = os.path.join(base_path, folder)
         for sub in subdirs:
             path = os.path.join(base_folder, sub)
@@ -155,7 +180,9 @@ def create_backup(source_path: str, backup_path: str) -> dict[str, Any]:
             dst = os.path.join(dest_path, item)
             if os.path.isdir(src):
                 try:
-                    shutil.copytree(src, dst, symlinks=True, ignore_dangling_symlinks=True)
+                    shutil.copytree(
+                        src, dst, symlinks=True, ignore_dangling_symlinks=True
+                    )
                     created.append(f"{item}/")
                 except OSError as e:
                     errors.append(f"{item}/: {e}")
@@ -213,13 +240,19 @@ def create_analytics_report(base_path: str) -> dict[str, Any]:
             para_files += 1
         for tag in file_info.get("tags", []):
             tag_counts[tag] += 1
-        largest_files.append({
-            "path": file_info.get("path", ""),
-            "size": file_info.get("size", 0),
-            "category": file_info.get("category", ""),
-        })
+        largest_files.append(
+            {
+                "path": file_info.get("path", ""),
+                "size": file_info.get("size", 0),
+                "category": file_info.get("category", ""),
+            }
+        )
     largest_files.sort(key=lambda item: item["size"], reverse=True)
-    duplicate_summary = {"duplicate_groups": 0, "total_duplicates": 0, "total_wasted_bytes": 0}
+    duplicate_summary = {
+        "duplicate_groups": 0,
+        "total_duplicates": 0,
+        "total_wasted_bytes": 0,
+    }
     if find_all_duplicates:
         duplicates = find_all_duplicates(base_path, by_content=True, by_name=True)
         duplicate_summary = {
@@ -228,14 +261,18 @@ def create_analytics_report(base_path: str) -> dict[str, Any]:
             "total_wasted_bytes": duplicates.get("total_wasted_bytes", 0),
         }
     total_files = categorized.get("total_files", 0)
-    organization_pct = round((para_files / total_files) * 100, 2) if total_files else 0.0
+    organization_pct = (
+        round((para_files / total_files) * 100, 2) if total_files else 0.0
+    )
     return {
         "path": base_path,
         "total_files": total_files,
         "total_size_bytes": total_size_bytes,
         "file_types": dict(file_types),
         "category_distribution": categorized.get("summary", {}),
-        "top_tags": [{"tag": tag, "count": count} for tag, count in tag_counts.most_common(10)],
+        "top_tags": [
+            {"tag": tag, "count": count} for tag, count in tag_counts.most_common(10)
+        ],
         "largest_files": largest_files[:5],
         "organization_percentage": organization_pct,
         "duplicates": duplicate_summary,

@@ -6,6 +6,7 @@ and provides the CLI entry point.
 
 Run: python src/file_org_wiz/mcp_server.py [--port PORT] [--host HOST] [--mount PATH]
 """
+
 from __future__ import annotations
 
 import os
@@ -15,18 +16,8 @@ from flask import Flask
 from flask_cors import CORS
 
 from file_org_wiz.api.routes import register_routes
+
 # Re-export core functions for backward compatibility
-from file_org_wiz.core.organizer import (
-    apply_naming_convention,
-    create_analytics_report,
-    create_backup,
-    create_folder_structure,
-    create_template_structure,
-    get_directory_structure,
-    safe_join_path,
-    sanitize_filename,
-    validate_path,
-)
 
 
 def create_app() -> Flask:
@@ -49,10 +40,18 @@ app = create_app()
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="File Organization Wizard MCP Server")
-    parser.add_argument("--host", default=os.environ.get("FILE_ORG_WIZ_HOST", "127.0.0.1"))
-    parser.add_argument("--port", type=int, default=int(os.environ.get("FILE_ORG_WIZ_PORT", "5000")))
-    parser.add_argument("--mount", default=os.environ.get("FILE_ORG_WIZ_MOUNT", "/data"))
-    parser.add_argument("--backup", default=os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup"))
+    parser.add_argument(
+        "--host", default=os.environ.get("FILE_ORG_WIZ_HOST", "127.0.0.1")
+    )
+    parser.add_argument(
+        "--port", type=int, default=int(os.environ.get("FILE_ORG_WIZ_PORT", "5000"))
+    )
+    parser.add_argument(
+        "--mount", default=os.environ.get("FILE_ORG_WIZ_MOUNT", "/data")
+    )
+    parser.add_argument(
+        "--backup", default=os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup")
+    )
     parser.add_argument("--cors", action="store_true", default=False)
     args = parser.parse_args()
 

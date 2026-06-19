@@ -1,4 +1,5 @@
 """Flask route handlers for file-org-wiz MCP server."""
+
 from __future__ import annotations
 
 import os
@@ -40,27 +41,43 @@ def register_routes(app: Any) -> None:
 
     @app.route("/health", methods=["GET"])
     def health_check() -> Response:
-        return jsonify({"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"})
+        return jsonify(
+            {"status": "healthy", "service": "file-org-wiz-mcp", "version": "1.3.0"}
+        )
 
     @app.route("/organize", methods=["POST"])
     def organize() -> tuple[Response, int]:
         data = request.get_json(silent=True) or {}
-        mount_path = data.get("mount_path", data.get("path", os.environ.get("FILE_ORG_WIZ_MOUNT", "/data")))
-        backup_path = data.get("backup_path", os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup"))
+        mount_path = data.get(
+            "mount_path",
+            data.get("path", os.environ.get("FILE_ORG_WIZ_MOUNT", "/data")),
+        )
+        backup_path = data.get(
+            "backup_path", os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup")
+        )
         dry_run = data.get("dry_run", False)
         template = data.get("template", "")
-        create_vault = data.get("create_vault", False)
+        data.get("create_vault", False)
 
         valid, error = validate_path(mount_path)
         if not valid:
             return jsonify({"error": error}), 400
 
         if dry_run:
-            return jsonify({"message": "Dry run mode", "suggested_actions": [
-                "Create PARA folder structure",
-                f"Template: {template}" if template else "Scan and categorize files",
-                f"Backup to {backup_path}" if data.get("do_backup") else "No backup requested",
-            ]}), 200
+            return jsonify(
+                {
+                    "message": "Dry run mode",
+                    "suggested_actions": [
+                        "Create PARA folder structure",
+                        f"Template: {template}"
+                        if template
+                        else "Scan and categorize files",
+                        f"Backup to {backup_path}"
+                        if data.get("do_backup")
+                        else "No backup requested",
+                    ],
+                }
+            ), 200
 
         results: dict[str, Any] = {"structure": {}, "backup": {}, "errors": []}
 
@@ -91,7 +108,9 @@ def register_routes(app: Any) -> None:
     def backup() -> tuple[Response, int]:
         data = request.get_json(silent=True) or {}
         source = data.get("source_path", os.environ.get("FILE_ORG_WIZ_MOUNT", "/data"))
-        dest = data.get("backup_path", os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup"))
+        dest = data.get(
+            "backup_path", os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup")
+        )
         result = create_backup(source, dest)
         status = 207 if result.get("errors") else 200
         return jsonify(result), status
@@ -143,18 +162,22 @@ def register_routes(app: Any) -> None:
         if not valid:
             return jsonify({"error": error}), 400
         tags = generate_content_tags(file_path) if generate_content_tags else []
-        description = infer_context_description(file_path) if infer_context_description else ""
-        return jsonify({
-            "file_path": file_path,
-            "tags": tags,
-            "suggested_description": description or os.path.basename(file_path),
-        }), 200
+        description = (
+            infer_context_description(file_path) if infer_context_description else ""
+        )
+        return jsonify(
+            {
+                "file_path": file_path,
+                "tags": tags,
+                "suggested_description": description or os.path.basename(file_path),
+            }
+        ), 200
 
     @app.route("/nlp-command", methods=["POST"])
     def nlp_command() -> tuple[Response, int]:
         data = request.get_json(silent=True) or {}
         command = data.get("command", "")
-        preview_only = data.get("preview_only", False)
+        data.get("preview_only", False)
         if not command:
             return jsonify({"error": "No command provided"}), 400
         if parse_organization_command:
@@ -163,33 +186,73 @@ def register_routes(app: Any) -> None:
                 payload = generate_mcp_payload(parsed)
                 payload["status"] = "parsed"
                 return jsonify(payload), 200
-        return jsonify({"parsed": command, "message": "NLP processing not available"}), 200
+        return jsonify(
+            {"parsed": command, "message": "NLP processing not available"}
+        ), 200
 
     @app.route("/mcp-manifest", methods=["GET"])
     def mcp_manifest() -> Response:
-        return jsonify({
-            "protocol": "MCP",
-            "version": "1.0",
-            "tools": [
-                {"name": "health", "description": "Health check"},
-                {"name": "organize", "description": "Execute reorganization"},
-                {"name": "backup", "description": "Create backup"},
-                {"name": "structure", "description": "Get directory structure"},
-                {"name": "analytics", "description": "Get analytics"},
-                {"name": "apply-names", "description": "Apply naming convention"},
-                {"name": "analyze-file", "description": "Analyze single file"},
-                {"name": "nlp-command", "description": "Natural language commands"},
-                {"name": "mcp-manifest", "description": "This manifest"},
-            ],
-            "endpoints": [
-                {"path": "/health", "methods": ["GET"], "description": "Health check"},
-                {"path": "/organize", "methods": ["POST"], "description": "Execute reorganization"},
-                {"path": "/backup", "methods": ["POST"], "description": "Create backup"},
-                {"path": "/structure", "methods": ["GET"], "description": "Get directory structure"},
-                {"path": "/analytics", "methods": ["GET"], "description": "Get analytics"},
-                {"path": "/apply-names", "methods": ["POST"], "description": "Apply naming convention"},
-                {"path": "/analyze-file", "methods": ["POST"], "description": "Analyze single file"},
-                {"path": "/nlp-command", "methods": ["POST"], "description": "Natural language commands"},
-                {"path": "/mcp-manifest", "methods": ["GET"], "description": "This manifest"},
-            ],
-        })
+        return jsonify(
+            {
+                "protocol": "MCP",
+                "version": "1.0",
+                "tools": [
+                    {"name": "health", "description": "Health check"},
+                    {"name": "organize", "description": "Execute reorganization"},
+                    {"name": "backup", "description": "Create backup"},
+                    {"name": "structure", "description": "Get directory structure"},
+                    {"name": "analytics", "description": "Get analytics"},
+                    {"name": "apply-names", "description": "Apply naming convention"},
+                    {"name": "analyze-file", "description": "Analyze single file"},
+                    {"name": "nlp-command", "description": "Natural language commands"},
+                    {"name": "mcp-manifest", "description": "This manifest"},
+                ],
+                "endpoints": [
+                    {
+                        "path": "/health",
+                        "methods": ["GET"],
+                        "description": "Health check",
+                    },
+                    {
+                        "path": "/organize",
+                        "methods": ["POST"],
+                        "description": "Execute reorganization",
+                    },
+                    {
+                        "path": "/backup",
+                        "methods": ["POST"],
+                        "description": "Create backup",
+                    },
+                    {
+                        "path": "/structure",
+                        "methods": ["GET"],
+                        "description": "Get directory structure",
+                    },
+                    {
+                        "path": "/analytics",
+                        "methods": ["GET"],
+                        "description": "Get analytics",
+                    },
+                    {
+                        "path": "/apply-names",
+                        "methods": ["POST"],
+                        "description": "Apply naming convention",
+                    },
+                    {
+                        "path": "/analyze-file",
+                        "methods": ["POST"],
+                        "description": "Analyze single file",
+                    },
+                    {
+                        "path": "/nlp-command",
+                        "methods": ["POST"],
+                        "description": "Natural language commands",
+                    },
+                    {
+                        "path": "/mcp-manifest",
+                        "methods": ["GET"],
+                        "description": "This manifest",
+                    },
+                ],
+            }
+        )
