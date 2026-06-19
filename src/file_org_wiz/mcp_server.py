@@ -16,6 +16,17 @@ from flask import Flask
 from flask_cors import CORS
 
 from file_org_wiz.api.routes import register_routes
+from file_org_wiz.core.organizer import (  # noqa: F401 — re-export for tests
+    apply_naming_convention,
+    create_analytics_report,
+    create_backup,
+    create_folder_structure,
+    create_template_structure,
+    get_directory_structure,
+    safe_join_path,
+    sanitize_filename,
+    validate_path,
+)
 
 # Re-export core functions for backward compatibility
 
