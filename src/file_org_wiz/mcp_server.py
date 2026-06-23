@@ -23,6 +23,7 @@ from file_org_wiz.core.organizer import (  # noqa: F401 — re-export for tests
     create_folder_structure,
     create_template_structure,
     get_directory_structure,
+    organize_files,
     safe_join_path,
     sanitize_filename,
     validate_path,

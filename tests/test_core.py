@@ -11,6 +11,7 @@ from file_org_wiz.mcp_server import (
     create_folder_structure,
     create_template_structure,
     get_directory_structure,
+    organize_files,
 )
 
 
@@ -206,3 +207,194 @@ class TestCreateAnalyticsReport:
 
         assert result["duplicates"]["duplicate_groups"] >= 1
         assert result["duplicates"]["total_duplicates"] >= 2
+
+
+class TestOrganizeFiles:
+    """Tests for organize_files function."""
+
+    def test_moves_files_to_correct_para_folders(self, mount_dir):
+        """Should move files to correct PARA subfolders based on category."""
+        # Create test files with different categories
+        files = {
+            "design.psd": "01_PROJECTS",
+            "invoice.xlsx": "02_AREAS",
+            "notes.md": "03_RESOURCES",
+            "archive.zip": "04_ARCHIVE",
+        }
+        categorized = []
+        for name, category in files.items():
+            path = os.path.join(mount_dir, name)
+            with open(path, "w") as f:
+                f.write(f"content for {name}")
+            ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
+            categorized.append(
+                {
+                    "path": path,
+                    "name": name,
+                    "extension": ext,
+                    "category": category,
+                    "size": os.path.getsize(path),
+                }
+            )
+
+        create_folder_structure(mount_dir)
+        result = organize_files(mount_dir, categorized)
+
+        assert result["total_moved"] == 4
+        assert result["total_errors"] == 0
+
+        # Each file landed in the correct PARA folder
+        # Note: area/resource files may route to subfolders (e.g. 02_AREAS/Finance/)
+        def find_in_para(base, filename, para_folder):
+            para_path = os.path.join(base, para_folder)
+            if not os.path.exists(para_path):
+                return False
+            for root, _dirs, files in os.walk(para_path):
+                if filename in files:
+                    return True
+            return False
+
+        assert os.path.exists(
+            os.path.join(mount_dir, "01_PROJECTS", "design.psd")
+        ), "design.psd should be in 01_PROJECTS"
+        assert find_in_para(
+            mount_dir, "invoice.xlsx", "02_AREAS"
+        ), "invoice.xlsx should be in 02_AREAS"
+        assert os.path.exists(
+            os.path.join(mount_dir, "03_RESOURCES", "notes.md")
+        ), "notes.md should be in 03_RESOURCES"
+        assert os.path.exists(
+            os.path.join(mount_dir, "04_ARCHIVE", "archive.zip")
+        ), "archive.zip should be in 04_ARCHIVE"
+
+        # Originals are gone
+        assert not os.path.exists(os.path.join(mount_dir, "design.psd"))
+        assert not os.path.exists(os.path.join(mount_dir, "invoice.xlsx"))
+
+    def test_dry_run_does_not_move_files(self, mount_dir):
+        """Dry run should preview moves without actually moving."""
+        path = os.path.join(mount_dir, "report.pdf")
+        with open(path, "w") as f:
+            f.write("content")
+        categorized = [
+            {
+                "path": path,
+                "name": "report.pdf",
+                "extension": "pdf",
+                "category": "03_RESOURCES",
+            }
+        ]
+
+        create_folder_structure(mount_dir)
+        result = organize_files(mount_dir, categorized, dry_run=True)
+
+        assert result["total_moved"] == 1
+        assert result["moved"][0]["dry_run"] is True
+
+        # File still at original location
+        assert os.path.exists(path)
+        assert not os.path.exists(
+            os.path.join(mount_dir, "03_RESOURCES", "report.pdf")
+        )
+
+    def test_skips_files_already_in_para(self, mount_dir):
+        """Should skip files that already reside inside a PARA folder."""
+        create_folder_structure(mount_dir)
+        path = os.path.join(mount_dir, "01_PROJECTS", "existing.psd")
+        with open(path, "w") as f:
+            f.write("content")
+        categorized = [
+            {
+                "path": path,
+                "name": "existing.psd",
+                "extension": "psd",
+                "category": "01_PROJECTS",
+            }
+        ]
+
+        result = organize_files(mount_dir, categorized)
+
+        assert result["total_moved"] == 0
+        assert result["total_skipped"] == 1
+        assert result["skipped"][0]["reason"] is not None
+        assert "PARA" in result["skipped"][0]["reason"]
+
+    def test_reports_missing_files_as_errors(self, mount_dir):
+        """Should report errors for files that do not exist on disk."""
+        categorized = [
+            {
+                "path": os.path.join(mount_dir, "ghost.txt"),
+                "name": "ghost.txt",
+                "extension": "txt",
+                "category": "03_RESOURCES",
+            }
+        ]
+
+        result = organize_files(mount_dir, categorized)
+
+        assert result["total_errors"] == 1
+        assert "does not exist" in result["errors"][0]["error"]
+
+    def test_routes_to_area_subfolders(self, mount_dir):
+        """Should route files to the correct area subfolder by keyword."""
+        create_folder_structure(mount_dir)
+
+        paths = {
+            "invoice_2024.pdf": "02_AREAS",
+            "health_log.csv": "02_AREAS",
+        }
+        categorized = []
+        for name, cat in paths.items():
+            fp = os.path.join(mount_dir, name)
+            with open(fp, "w") as f:
+                f.write(name)
+            categorized.append(
+                {
+                    "path": fp,
+                    "name": name,
+                    "extension": name.rsplit(".", 1)[-1],
+                    "category": cat,
+                }
+            )
+
+        result = organize_files(mount_dir, categorized)
+        assert result["total_moved"] == 2
+
+        assert os.path.exists(
+            os.path.join(mount_dir, "02_AREAS", "Finance", "invoice_2024.pdf")
+        )
+        assert os.path.exists(
+            os.path.join(mount_dir, "02_AREAS", "Health", "health_log.csv")
+        )
+
+    def test_routes_to_resource_subfolders(self, mount_dir):
+        """Should route files to the correct resource subfolder by extension."""
+        create_folder_structure(mount_dir)
+
+        paths = {
+            "photo.png": "03_RESOURCES",
+            "book.pdf": "03_RESOURCES",
+        }
+        categorized = []
+        for name, cat in paths.items():
+            fp = os.path.join(mount_dir, name)
+            with open(fp, "w") as f:
+                f.write(name)
+            categorized.append(
+                {
+                    "path": fp,
+                    "name": name,
+                    "extension": name.rsplit(".", 1)[-1],
+                    "category": cat,
+                }
+            )
+
+        result = organize_files(mount_dir, categorized)
+        assert result["total_moved"] == 2
+
+        assert os.path.exists(
+            os.path.join(mount_dir, "03_RESOURCES", "Media", "photo.png")
+        )
+        assert os.path.exists(
+            os.path.join(mount_dir, "03_RESOURCES", "Reading", "book.pdf")
+        )

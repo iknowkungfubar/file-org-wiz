@@ -14,8 +14,14 @@ from file_org_wiz.core.organizer import (
     create_folder_structure,
     create_template_structure,
     get_directory_structure,
+    organize_files,
     validate_path,
 )
+
+try:
+    from file_org_wiz.scanner import scan_and_categorize
+except ImportError:
+    scan_and_categorize = None
 
 try:
     from file_org_wiz.nlp_processor import (
@@ -64,20 +70,32 @@ def register_routes(app: Any) -> None:
             return jsonify({"error": error}), 400
 
         if dry_run:
-            return jsonify(
-                {
-                    "message": "Dry run mode",
-                    "suggested_actions": [
-                        "Create PARA folder structure",
-                        f"Template: {template}"
-                        if template
-                        else "Scan and categorize files",
-                        f"Backup to {backup_path}"
-                        if data.get("do_backup")
-                        else "No backup requested",
-                    ],
+            preview = {
+                "message": "Dry run mode — no files were moved",
+                "suggested_actions": ["Create PARA folder structure"],
+            }
+            if template:
+                preview["suggested_actions"].append(
+                    f"Apply template: {template}"
+                )
+            if data.get("do_backup"):
+                preview["suggested_actions"].append(
+                    f"Backup to {backup_path}"
+                )
+
+            # Preview scan + file-move results
+            if scan_and_categorize:
+                categorized = scan_and_categorize(mount_path)
+                preview["scan"] = {
+                    "total_files": categorized["total_files"],
+                    "summary": categorized["summary"],
                 }
-            ), 200
+                organize_preview = organize_files(
+                    mount_path, categorized["files"], dry_run=True
+                )
+                preview["organize_preview"] = organize_preview
+
+            return jsonify(preview), 200
 
         results: dict[str, Any] = {"phases": [], "errors": []}
 
@@ -100,6 +118,27 @@ def register_routes(app: Any) -> None:
             results["phases"].append({"name": "backup", **backup_result})
             if backup_result.get("errors"):
                 results["errors"].extend(backup_result["errors"])
+
+        # Scan and organize files into PARA subfolders
+        if scan_and_categorize:
+            categorized = scan_and_categorize(mount_path)
+            results["phases"].append(
+                {
+                    "name": "scan",
+                    "total_files": categorized["total_files"],
+                    "summary": categorized["summary"],
+                }
+            )
+            organize_result = organize_files(
+                mount_path, categorized["files"], dry_run=False
+            )
+            results["phases"].append(
+                {"name": "organize_files", **organize_result}
+            )
+            if organize_result.get("errors"):
+                results["errors"].extend(
+                    e.get("error", str(e)) for e in organize_result["errors"]
+                )
 
         results["status"] = "complete"
         return jsonify(results), 200
