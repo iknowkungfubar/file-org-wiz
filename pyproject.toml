@@ -50,3 +50,17 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["file_org_wiz*"]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "S", "SIM", "Q"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
