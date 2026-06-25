@@ -75,13 +75,9 @@ def register_routes(app: Any) -> None:
                 "suggested_actions": ["Create PARA folder structure"],
             }
             if template:
-                preview["suggested_actions"].append(
-                    f"Apply template: {template}"
-                )
+                preview["suggested_actions"].append(f"Apply template: {template}")
             if data.get("do_backup"):
-                preview["suggested_actions"].append(
-                    f"Backup to {backup_path}"
-                )
+                preview["suggested_actions"].append(f"Backup to {backup_path}")
 
             # Preview scan + file-move results
             if scan_and_categorize:
@@ -132,9 +128,7 @@ def register_routes(app: Any) -> None:
             organize_result = organize_files(
                 mount_path, categorized["files"], dry_run=False
             )
-            results["phases"].append(
-                {"name": "organize_files", **organize_result}
-            )
+            results["phases"].append({"name": "organize_files", **organize_result})
             if organize_result.get("errors"):
                 results["errors"].extend(
                     e.get("error", str(e)) for e in organize_result["errors"]
