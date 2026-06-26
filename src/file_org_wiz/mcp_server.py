@@ -9,8 +9,8 @@ Run: python src/file_org_wiz/mcp_server.py [--port PORT] [--host HOST] [--mount 
 
 from __future__ import annotations
 
-import os
 import argparse
+import os
 
 from flask import Flask
 from flask_cors import CORS

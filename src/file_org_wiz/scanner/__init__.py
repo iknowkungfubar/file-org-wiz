@@ -287,7 +287,7 @@ def get_quick_hash(file_path):
     try:
         file_size = os.path.getsize(file_path)
 
-        hash_func = hashlib.md5()
+        hash_func = hashlib.md5()  # noqa: S324
 
         with open(file_path, "rb") as f:
             # First 4KB

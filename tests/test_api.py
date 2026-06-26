@@ -37,9 +37,9 @@ class TestHealthEndpoint:
         response = client.get("/health")
         data = json.loads(response.data)
 
-        assert response.status_code == 200
-        assert data["status"] == "healthy"
-        assert data["service"] == "file-org-wiz-mcp"
+        assert response.status_code == 200  # noqa: S101
+        assert data["status"] == "healthy"  # noqa: S101
+        assert data["service"] == "file-org-wiz-mcp"  # noqa: S101
 
     def test_health_includes_version(self, client):
         """Health endpoint should include version."""
@@ -65,7 +65,7 @@ class TestOrganizeEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert data["status"] == "complete"
 
     def test_organize_creates_folders(self, client, mount_dir, backup_dir):
@@ -102,7 +102,7 @@ class TestOrganizeEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         phases = data.get("phases", [])
         backup_phase = next((p for p in phases if p["name"] == "backup"), None)
         assert backup_phase is not None
@@ -119,7 +119,7 @@ class TestOrganizeEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         phases = data.get("phases", [])
         template_phase = next(
             (p for p in phases if p["name"] == "apply_template"), None
@@ -140,7 +140,7 @@ class TestBackupEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert "backup_path" in data
         assert "backup__" in data["backup_path"]
 
@@ -152,7 +152,7 @@ class TestBackupEndpoint:
         data = json.loads(response.data)
 
         # Should return success but include error info
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert "error" in data or len(data.get("errors", [])) > 0
 
 
@@ -164,7 +164,7 @@ class TestStructureEndpoint:
         response = client.get(f"/structure?path={mount_dir}")
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert "structure" in data or "error" in data
 
     def test_structure_with_depth(self, client, mount_dir):
@@ -172,7 +172,7 @@ class TestStructureEndpoint:
         response = client.get(f"/structure?path={mount_dir}&max_depth=2")
         json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
 
     def test_structure_with_invalid_path(self, client):
         """Structure with invalid path should include error in response."""
@@ -180,7 +180,7 @@ class TestStructureEndpoint:
         data = json.loads(response.data)
 
         # Should return success but include error info
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert "error" in data or "structure" in data
 
 
@@ -198,7 +198,7 @@ class TestAnalyticsEndpoint:
         response = client.get(f"/analytics?path={mount_dir}")
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert data["total_files"] == 2
         assert data["file_types"]["pdf"] == 1
         assert "category_distribution" in data
@@ -253,7 +253,7 @@ class TestApplyNamesEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert data["success"] is True
 
 
@@ -265,7 +265,7 @@ class TestMCPManifestEndpoint:
         response = client.get("/mcp-manifest")
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert "tools" in data
         assert len(data["tools"]) > 0
 
@@ -295,7 +295,7 @@ class TestNlpCommandEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert data["status"] == "parsed"
         assert data["parsed_command"]["action"] == "find"
         assert "pdf" in data["parsed_command"]["filters"]["file_types"]
@@ -323,7 +323,7 @@ class TestNlpCommandEndpoint:
         )
         data = json.loads(response.data)
 
-        assert response.status_code == 200
+        assert response.status_code == 200  # noqa: S101
         assert data["success"] is True
         result = os.path.basename(data["renamed"]).lower()
         assert "invoice" in result or "finance" in result

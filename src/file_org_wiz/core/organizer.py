@@ -280,11 +280,7 @@ def organize_files(
 
         # Skip files already inside a PARA folder
         rel_path = os.path.relpath(file_path, base_path)
-        top_level = (
-            rel_path.split(os.sep, 1)[0]
-            if rel_path and rel_path != "."
-            else ""
-        )
+        top_level = rel_path.split(os.sep, 1)[0] if rel_path and rel_path != "." else ""
         if top_level in PARA_FOLDERS:
             manifest["skipped"].append(
                 {
@@ -301,9 +297,7 @@ def organize_files(
             manifest["moved"].append(
                 {
                     "source": file_path,
-                    "destination": os.path.join(
-                        dest_dir, os.path.basename(file_path)
-                    ),
+                    "destination": os.path.join(dest_dir, os.path.basename(file_path)),
                     "dry_run": True,
                 }
             )
@@ -312,13 +306,9 @@ def organize_files(
         try:
             os.makedirs(dest_dir, exist_ok=True)
             dest_path = shutil.move(file_path, dest_dir)
-            manifest["moved"].append(
-                {"source": file_path, "destination": dest_path}
-            )
+            manifest["moved"].append({"source": file_path, "destination": dest_path})
         except OSError as e:
-            manifest["errors"].append(
-                {"source": file_path, "error": str(e)}
-            )
+            manifest["errors"].append({"source": file_path, "error": str(e)})
 
     manifest["total_moved"] = len(manifest["moved"])
     manifest["total_errors"] = len(manifest["errors"])
