@@ -254,18 +254,18 @@ class TestOrganizeFiles:
                     return True
             return False
 
-        assert os.path.exists(
-            os.path.join(mount_dir, "01_PROJECTS", "design.psd")
-        ), "design.psd should be in 01_PROJECTS"
-        assert find_in_para(
-            mount_dir, "invoice.xlsx", "02_AREAS"
-        ), "invoice.xlsx should be in 02_AREAS"
-        assert os.path.exists(
-            os.path.join(mount_dir, "03_RESOURCES", "notes.md")
-        ), "notes.md should be in 03_RESOURCES"
-        assert os.path.exists(
-            os.path.join(mount_dir, "04_ARCHIVE", "archive.zip")
-        ), "archive.zip should be in 04_ARCHIVE"
+        assert os.path.exists(os.path.join(mount_dir, "01_PROJECTS", "design.psd")), (
+            "design.psd should be in 01_PROJECTS"
+        )
+        assert find_in_para(mount_dir, "invoice.xlsx", "02_AREAS"), (
+            "invoice.xlsx should be in 02_AREAS"
+        )
+        assert os.path.exists(os.path.join(mount_dir, "03_RESOURCES", "notes.md")), (
+            "notes.md should be in 03_RESOURCES"
+        )
+        assert os.path.exists(os.path.join(mount_dir, "04_ARCHIVE", "archive.zip")), (
+            "archive.zip should be in 04_ARCHIVE"
+        )
 
         # Originals are gone
         assert not os.path.exists(os.path.join(mount_dir, "design.psd"))
@@ -293,9 +293,7 @@ class TestOrganizeFiles:
 
         # File still at original location
         assert os.path.exists(path)
-        assert not os.path.exists(
-            os.path.join(mount_dir, "03_RESOURCES", "report.pdf")
-        )
+        assert not os.path.exists(os.path.join(mount_dir, "03_RESOURCES", "report.pdf"))
 
     def test_skips_files_already_in_para(self, mount_dir):
         """Should skip files that already reside inside a PARA folder."""
