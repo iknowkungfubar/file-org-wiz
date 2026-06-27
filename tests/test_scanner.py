@@ -2,7 +2,6 @@
 
 import os
 
-
 from file_org_wiz.scanner import (
     classify_by_extension,
     classify_by_name,

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 
-
 from file_org_wiz.file_intelligence import generate_content_tags, suggest_smart_filename
 from file_org_wiz.nlp_processor import generate_mcp_payload, parse_organization_command
 

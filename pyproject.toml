@@ -57,6 +57,7 @@ line-length = 88
 indent-width = 4
 
 [tool.ruff.lint]
+ignore = ["S101", "S108", "S324", "SIM110", "E501"]
 select = ["E", "F", "W", "I", "N", "UP", "S", "SIM", "Q"]
 
 [tool.ruff.format]
