@@ -59,6 +59,10 @@ indent-width = 4
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "S", "SIM", "Q"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]
+"src/file_org_wiz/duplicates/__init__.py" = ["S324"]  # md5 for dedup, not crypto
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
