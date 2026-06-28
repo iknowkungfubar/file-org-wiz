@@ -64,3 +64,7 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]
+"src/file_org_wiz/duplicates/__init__.py" = ["S324"]
