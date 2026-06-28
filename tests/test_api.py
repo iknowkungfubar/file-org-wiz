@@ -305,7 +305,9 @@ class TestNlpCommandEndpoint:
     )
     @pytest.mark.xfail(
         strict=False,
-        reason="infer_context_description returns a tuple, not a content-based description",
+        reason=(
+            "infer_context_description returns a tuple, not a content-based description"
+        ),
     )
     def test_apply_names_can_auto_describe(self, client, mount_dir):
         test_file = os.path.join(mount_dir, "scan001.txt")

@@ -45,7 +45,8 @@ class TestContentTagging:
         file_path = os.path.join(mount_dir, "scan001.txt")
         with open(file_path, "w", encoding="utf-8") as handle:
             handle.write(
-                "Team meeting notes about project launch timeline and client milestones."
+                "Team meeting notes about project launch timeline "
+                "and client milestones."
             )
 
         suggested = suggest_smart_filename(file_path)
