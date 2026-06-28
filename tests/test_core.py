@@ -3,7 +3,6 @@
 import os
 
 # Add src to path
-
 from file_org_wiz.mcp_server import (
     apply_naming_convention,
     create_analytics_report,
@@ -249,10 +248,7 @@ class TestOrganizeFiles:
             para_path = os.path.join(base, para_folder)
             if not os.path.exists(para_path):
                 return False
-            for root, _dirs, files in os.walk(para_path):
-                if filename in files:
-                    return True
-            return False
+            return any(filename in files for root, _dirs, files in os.walk(para_path))
 
         assert os.path.exists(os.path.join(mount_dir, "01_PROJECTS", "design.psd")), (
             "design.psd should be in 01_PROJECTS"
