@@ -2,7 +2,6 @@
 
 import os
 
-
 from file_org_wiz.zettelkasten import (
     analyze_links,
     create_moc_file,

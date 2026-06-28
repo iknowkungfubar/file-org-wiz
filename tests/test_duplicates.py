@@ -2,7 +2,6 @@
 
 import os
 
-
 from file_org_wiz.duplicates import (
     find_duplicates_by_size,
     format_bytes,
