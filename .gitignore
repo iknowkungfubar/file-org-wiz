@@ -153,34 +153,25 @@ test_mount/
 *.obsidian/
 .vault/
 
-# Hermes agent artifacts (AI instruction files, prompts)
-.hermes/
-
-# AI agent artifacts (local context — never committed)
-CLAUDE.md
+# AI Agent Artifacts — security: do not commit
 AGENTS.md
+CLAUDE.md
+CLAUDE_CODE.md
 RULES.md
 SOUL.md
 .cursor/
 .cursorrules
+.cursor/**
 .windsurfrules
 .opencode/
 .aider*
 COPILOT_INSTRUCTIONS.md
 .claude/
-
-# AI Agent Artifacts (SECRETS)
-AGENTS.md
-CLAUDE.md
-CLAUDE_CODE.md
-.cursorrules
-.cursor/**
-.windsurfrules
 CONTEXT.md
 MEMORY.md
+SKILL.md
 ai-instructions.md
 ai-context.md
 .github/copilot-instructions.md
 .hermes/
-SKILL.md
 *.hermes-profile
