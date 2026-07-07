@@ -8,6 +8,9 @@ from file_org_wiz.zettelkasten import (
     extract_wikilinks,
     find_similar_notes,
     generate_moc_content,
+    get_vault_stats,
+    scan_for_moc_candidates,
+    scan_vault,
     split_atomic_notes,
 )
 
@@ -146,3 +149,96 @@ Content one.
 
         # First result should have frontmatter
         assert len(result) > 0
+
+
+class TestScanForMOCCandidates:
+    """Tests for scan_for_moc_candidates function."""
+
+    def test_finds_folders_meeting_minimum(self, mount_dir):
+        """Should detect folders with enough .md files."""
+        notes_dir = os.path.join(mount_dir, "my-topic")
+        os.makedirs(notes_dir)
+        for i in range(6):
+            with open(os.path.join(notes_dir, f"note{i}.md"), "w") as f:
+                f.write(f"# Note {i}")
+
+        small_dir = os.path.join(mount_dir, "small-topic")
+        os.makedirs(small_dir)
+        with open(os.path.join(small_dir, "only.md"), "w") as f:
+            f.write("# Only note")
+
+        candidates = scan_for_moc_candidates(mount_dir, min_notes=5)
+
+        assert "my-topic" in candidates
+        assert len(candidates["my-topic"]) == 6
+        assert "small-topic" not in candidates
+
+    def test_excludes_hidden_files(self, mount_dir):
+        """Should skip hidden .md files."""
+        notes_dir = os.path.join(mount_dir, "topic")
+        os.makedirs(notes_dir)
+        for i in range(5):
+            with open(os.path.join(notes_dir, f"note{i}.md"), "w") as f:
+                f.write(f"# Note {i}")
+        with open(os.path.join(notes_dir, ".hidden.md"), "w") as f:
+            f.write("# hidden")
+
+        candidates = scan_for_moc_candidates(mount_dir, min_notes=5)
+        assert "topic" in candidates
+        assert ".hidden.md" not in candidates["topic"]
+
+    def test_empty_vault(self, mount_dir):
+        """Empty vault should return no candidates."""
+        candidates = scan_for_moc_candidates(mount_dir)
+        assert candidates == {}
+
+
+class TestGetVaultStats:
+    """Tests for get_vault_stats function."""
+
+    def test_counts_notes_and_words(self, mount_dir):
+        """Should count total notes, words, and link stats."""
+        for name, content in [
+            ("note-a.md", "This note has five words here"),
+            ("note-b.md", "[[other]] link in here has six words"),
+            ("note-c.md", "Short"),
+        ]:
+            with open(os.path.join(mount_dir, name), "w", encoding="utf-8") as f:
+                f.write(content)
+
+        stats = get_vault_stats(mount_dir)
+
+        assert stats["total_notes"] == 3
+        assert stats["total_words"] > 0
+        assert stats["avg_words_per_note"] > 0
+        assert stats["notes_with_links"] == 1  # note-b.md only
+
+    def test_handles_empty_vault(self, mount_dir):
+        """Empty vault should return zero stats."""
+        stats = get_vault_stats(mount_dir)
+        assert stats["total_notes"] == 0
+        assert stats["total_words"] == 0
+        assert stats["avg_words_per_note"] == 0
+        assert stats["notes_with_links"] == 0
+
+
+class TestScanVault:
+    """Tests for scan_vault function."""
+
+    def test_returns_notes_with_content_and_links(self, mount_dir):
+        """Should scan and return full note metadata."""
+        with open(os.path.join(mount_dir, "alpha.md"), "w", encoding="utf-8") as f:
+            f.write("# Alpha\n\nLink to [[beta]].")
+        with open(os.path.join(mount_dir, "beta.md"), "w", encoding="utf-8") as f:
+            f.write("# Beta")
+
+        notes = scan_vault(mount_dir)
+
+        assert len(notes) == 2
+        paths = {n["name"] for n in notes}
+        assert "alpha.md" in paths
+        assert "beta.md" in paths
+        alpha = next(n for n in notes if n["name"] == "alpha.md")
+        assert "[[beta]]" in alpha["content"]
+        assert alpha["links"] == ["beta"]
+        assert alpha["has_moc"] is False
