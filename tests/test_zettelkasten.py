@@ -6,12 +6,15 @@ from file_org_wiz.zettelkasten import (
     analyze_links,
     create_moc_file,
     extract_wikilinks,
+    extract_wikilinks_from_file,
     find_similar_notes,
+    generate_all_mocs,
     generate_moc_content,
     get_vault_stats,
     scan_for_moc_candidates,
     scan_vault,
     split_atomic_notes,
+    suggest_links,
 )
 
 
@@ -242,3 +245,103 @@ class TestScanVault:
         assert "[[beta]]" in alpha["content"]
         assert alpha["links"] == ["beta"]
         assert alpha["has_moc"] is False
+
+
+class TestSuggestLinks:
+    """Tests for suggest_links function."""
+
+    def test_suggests_based_on_keyword_similarity(self):
+        """Should suggest notes based on content keyword overlap."""
+        all_notes = [
+            {"path": "/python-intro.md", "content": "Python programming basics and fundamentals for beginners guide"},
+            {"path": "/python-advanced.md", "content": "Advanced Python decorators and metaprogramming techniques"},
+            {"path": "/java-basics.md", "content": "Java programming syntax and object oriented design patterns"},
+        ]
+        suggestions = suggest_links(
+            note_path="/python-intro.md",
+            content="Python programming advanced decorators techniques",
+            all_notes=all_notes,
+            max_suggestions=2,
+        )
+        assert len(suggestions) <= 2
+        for s in suggestions:
+            assert "path" in s
+            assert "confidence" in s
+            assert isinstance(s["confidence"], float)
+
+    def test_returns_empty_for_no_similar_notes(self):
+        """Should return empty list when no similar notes exist."""
+        all_notes = [
+            {"path": "/python.md", "content": "Python programming language"},
+            {"path": "/cooking.md", "content": "Cooking recipes and kitchen tips"},
+        ]
+        suggestions = suggest_links(
+            note_path="/cooking.md",
+            content="Kitchen cooking recipes food",
+            all_notes=all_notes,
+        )
+        assert isinstance(suggestions, list)
+
+
+class TestGenerateMOCContentNoWikilinks:
+    """Tests for generate_moc_content with add_wikilinks=False."""
+
+    def test_generates_without_wikilinks(self):
+        """Should generate MOC without [[wikilinks]] when disabled."""
+        notes = ["note1.md", "note2.md"]
+        content = generate_moc_content("Test", notes, add_wikilinks=False)
+        assert "[[note1]]" not in content
+        assert "- note1" in content or "note1" in content
+
+
+class TestExtractWikilinksFromFile:
+    """Tests for extract_wikilinks_from_file function."""
+
+    def test_returns_empty_for_missing_file(self):
+        """Should return empty list for nonexistent file."""
+        result = extract_wikilinks_from_file("/nonexistent/file.md")
+        assert result == []
+
+    def test_extracts_from_valid_file(self, mount_dir):
+        """Should extract links from a real markdown file."""
+        path = os.path.join(mount_dir, "test.md")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("Link to [[alpha]] and [[beta]].")
+        result = extract_wikilinks_from_file(path)
+        assert "alpha" in result
+        assert "beta" in result
+
+
+class TestFindSimilarNotesEdgeCases:
+    """Tests for find_similar_notes edge cases."""
+
+    def test_skips_self_comparison(self):
+        """Should not compare a note to itself."""
+        target = {"path": "/self.md", "content": "Python programming guide basics tutorial"}
+        all_notes = [
+            {"path": "/self.md", "content": "Python programming guide basics tutorial"},
+            {"path": "/other.md", "content": "Python programming advanced concepts"},
+        ]
+        matches = find_similar_notes(target, all_notes)
+        paths = [m["path"] for m in matches]
+        assert "/self.md" not in paths
+
+    def test_returns_empty_when_no_content_keywords(self):
+        """Should return empty when target has no content words beyond stop words."""
+        target = {"path": "/stop.md", "content": "that this with from have were been they"}
+        all_notes = [
+            {"path": "/other.md", "content": "Python programming guide"},
+        ]
+        matches = find_similar_notes(target, all_notes)
+        assert matches == []
+
+
+class TestGenerateAllMocsErrorHandling:
+    """Tests for generate_all_mocs error path."""
+
+    def test_handles_nonexistent_vault(self):
+        """Should handle non-existent vault path gracefully."""
+        result = generate_all_mocs("/nonexistent/vault/path")
+        assert isinstance(result, dict)
+        assert "errors" in result
+        assert "mocs_generated" in result
