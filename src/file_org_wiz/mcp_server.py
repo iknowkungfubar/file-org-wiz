@@ -53,18 +53,29 @@ app = create_app()
 def main() -> None:
     parser = argparse.ArgumentParser(description="File Organization Wizard MCP Server")
     parser.add_argument(
-        "--host", default=os.environ.get("FILE_ORG_WIZ_HOST", "127.0.0.1")
+        "--host",
+        default=os.environ.get("FILE_ORG_WIZ_HOST", "127.0.0.1"),
+        help="Bind address (default: 127.0.0.1, env: FILE_ORG_WIZ_HOST)",
     )
     parser.add_argument(
-        "--port", type=int, default=int(os.environ.get("FILE_ORG_WIZ_PORT", "5000"))
+        "--port",
+        type=int,
+        default=int(os.environ.get("FILE_ORG_WIZ_PORT", "5000")),
+        help="Listen port (default: 5000, env: FILE_ORG_WIZ_PORT)",
     )
     parser.add_argument(
-        "--mount", default=os.environ.get("FILE_ORG_WIZ_MOUNT", "/data")
+        "--mount",
+        default=os.environ.get("FILE_ORG_WIZ_MOUNT", "/data"),
+        help="Root directory to organise (default: /data, env: FILE_ORG_WIZ_MOUNT)",
     )
     parser.add_argument(
-        "--backup", default=os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup")
+        "--backup",
+        default=os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup"),
+        help="Backup destination path (default: /data/backup, env: FILE_ORG_WIZ_BACKUP)",
     )
-    parser.add_argument("--cors", action="store_true", default=False)
+    parser.add_argument(
+        "--cors", action="store_true", default=False, help="Enable CORS headers (default: disabled)"
+    )
     args = parser.parse_args()
 
     if args.cors:

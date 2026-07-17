@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
 [![PyPI](https://img.shields.io/pypi/v/file-org-wiz)](https://pypi.org/project/file-org-wiz/)
+[![CI](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/codeql.yml)
 [![Tests](https://img.shields.io/badge/tests-96%20passed-green)](tests/)
 
 A complete file organization system that provides tools to reorganize any computer's files with consistent structure, naming conventions, and documentation using the PARA (Projects, Areas, Resources, Archive) methodology combined with Zettelkasten principles.
@@ -42,6 +44,18 @@ pipx install .
 
 ```bash
 file-org-wiz --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP
+# Portfolio alias (both commands work identically)
+turintech-file-org-wiz --port 5000 --mount /YOUR/MOUNT --backup /YOUR/BACKUP
+```
+
+### Examples
+
+Try the [examples/](examples/) directory:
+
+- **`examples/organize_downloads.py`** — Scan, analyze, and organize a directory of files using PARA + Zettelkasten methodology
+
+```bash
+python examples/organize_downloads.py /path/to/your/folder
 ```
 
 ### Test:

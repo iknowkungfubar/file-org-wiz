@@ -39,6 +39,7 @@ Documentation = "https://github.com/iknowkungfubar/file-org-wiz#readme"
 
 [project.scripts]
 file-org-wiz = "file_org_wiz.mcp_server:main"
+turintech-file-org-wiz = "file_org_wiz.mcp_server:main"
 
 [project.optional-dependencies]
 dev = [
