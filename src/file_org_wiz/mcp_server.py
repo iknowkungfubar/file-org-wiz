@@ -71,10 +71,15 @@ def main() -> None:
     parser.add_argument(
         "--backup",
         default=os.environ.get("FILE_ORG_WIZ_BACKUP", "/data/backup"),
-        help="Backup destination path (default: /data/backup, env: FILE_ORG_WIZ_BACKUP)",
+        help=(
+            "Backup destination path (default: /data/backup, env: FILE_ORG_WIZ_BACKUP)"
+        ),
     )
     parser.add_argument(
-        "--cors", action="store_true", default=False, help="Enable CORS headers (default: disabled)"
+        "--cors",
+        action="store_true",
+        default=False,
+        help="Enable CORS headers (default: disabled)",
     )
     args = parser.parse_args()
 
