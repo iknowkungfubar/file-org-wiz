@@ -91,7 +91,7 @@ Edit `~/.continue/config.yaml` to add MCP server.
 ### MCP not connecting
 
 Check server: `curl localhost:5005/health`
-Verify config YAML syntax: `python -c "import yaml; yaml.safe_load(open('~/.continue/config.yaml'))"`
+Verify config YAML syntax: `python -c "import yaml; yaml.safe_load(open('~/.continue/config.yaml'))"` (PyYAML is not installed by this project — `pip install pyyaml` once if `import yaml` fails)
 
 ### Tools not appearing
 
