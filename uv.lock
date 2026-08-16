@@ -154,7 +154,6 @@ source = { editable = "." }
 dependencies = [
     { name = "flask" },
     { name = "flask-cors" },
-    { name = "werkzeug" },
 ]
 
 [package.optional-dependencies]
@@ -171,7 +170,6 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
-    { name = "werkzeug", specifier = ">=2.3.0" },
 ]
 provides-extras = ["dev"]
 
