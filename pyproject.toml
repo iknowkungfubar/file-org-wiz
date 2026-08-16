@@ -28,7 +28,6 @@ classifiers = [
 ]
 dependencies = [
     "flask>=2.3.2",
-    "werkzeug>=2.3.0",
     "flask-cors>=4.0.0",
 ]
 
