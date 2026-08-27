@@ -98,7 +98,7 @@ curl -X POST localhost:5000/organize ...
 
 | Requirement | Version | Install |
 |-------------|---------|---------|
-| Python | 3.8+ | `python --version` |
+| Python | 3.10+ | `python --version` |
 | Flask | >= 2.3.2 | `pip install -r requirements.txt` |
 
 ---
