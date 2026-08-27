@@ -3,7 +3,7 @@
 > An AI-powered file organization system using the PARA + Zettelkasten methodology.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-green.svg)](https://www.python.org/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-green.svg)](https://www.python.org/)
 [![PyPI](https://img.shields.io/pypi/v/file-org-wiz)](https://pypi.org/project/file-org-wiz/)
 [![CI](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/file-org-wiz/actions/workflows/codeql.yml)
@@ -222,7 +222,7 @@ Pattern: `YYYY-MM-DD__context__description__vNN.ext`
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.10+
 - Flask >= 2.3.2
 - An AI agent that can execute bash commands, read/write files, and navigate directory structure
 
